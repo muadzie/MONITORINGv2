@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\AssessmentController;
+use App\Http\Controllers\Api\Siswa\CompanyInfoController;
 
 // ================================================================
 // ===================== AUTHENTICATION ROUTES ===================
@@ -43,6 +44,7 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
     
     // ---------------------- COMPANY MANAGEMENT -----------------
     Route::apiResource('companies', App\Http\Controllers\Api\Admin\CompanyController::class);
+    Route::get('/companies', [App\Http\Controllers\Api\Admin\CompanyController::class, 'index']);
     
     // ---------------------- CLASS MANAGEMENT -------------------
     Route::apiResource('classes', App\Http\Controllers\Api\Admin\ClassController::class);
@@ -88,6 +90,8 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
     Route::post('/settings/academic', [App\Http\Controllers\Api\Admin\SettingController::class, 'updateAcademic']);
     Route::get('/settings/radius', [App\Http\Controllers\Api\Admin\SettingController::class, 'radius']);
     Route::post('/settings/radius', [App\Http\Controllers\Api\Admin\SettingController::class, 'updateRadius']);
+
+    Route::get('/admin/students/stats', [App\Http\Controllers\Api\Admin\StudentController::class, 'stats']);
 });
 
 // ================================================================

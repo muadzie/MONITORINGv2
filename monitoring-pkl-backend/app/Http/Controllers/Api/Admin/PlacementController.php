@@ -12,7 +12,7 @@ class PlacementController extends Controller
 {
     public function index()
     {
-        $placements = Placement::with(['student', 'company'])
+        $placements = Placement::with(['student', 'company', 'teacher'])  // ← TAMBAHKAN 'teacher'
             ->orderBy('created_at', 'desc')
             ->get();
         
@@ -24,6 +24,7 @@ class PlacementController extends Controller
         $request->validate([
             'student_id' => 'required|exists:users,id',
             'company_id' => 'required|exists:companies,id',
+            'teacher_id' => 'required|exists:users,id',  // ← TAMBAHKAN VALIDASI INI
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
             'status' => 'required|in:active,completed,canceled',
@@ -41,19 +42,28 @@ class PlacementController extends Controller
             ], 400);
         }
 
-        $placement = Placement::create($request->all());
+        $placement = Placement::create([
+            'student_id' => $request->student_id,
+            'company_id' => $request->company_id,
+            'teacher_id' => $request->teacher_id,  // ← TAMBAHKAN INI
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'status' => $request->status,
+            'notes' => $request->notes,
+        ]);
         
-        // Update company_id di user
+        // Update company_id dan teacher_id di user
         User::where('id', $request->student_id)->update([
-            'company_id' => $request->company_id
+            'company_id' => $request->company_id,
+            'teacher_id' => $request->teacher_id  // ← TAMBAHKAN INI
         ]);
 
-        return response()->json($placement->load(['student', 'company']), 201);
+        return response()->json($placement->load(['student', 'company', 'teacher']), 201);
     }
 
     public function show($id)
     {
-        $placement = Placement::with(['student', 'company'])->findOrFail($id);
+        $placement = Placement::with(['student', 'company', 'teacher'])->findOrFail($id);
         return response()->json($placement);
     }
 
@@ -62,37 +72,61 @@ class PlacementController extends Controller
         $placement = Placement::findOrFail($id);
         
         $request->validate([
-            'student_id' => 'required|exists:users,id',
-            'company_id' => 'required|exists:companies,id',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-            'status' => 'required|in:active,completed,canceled',
+            'company_id' => 'exists:companies,id',
+            'teacher_id' => 'exists:users,id',  // ← TAMBAHKAN INI
+            'start_date' => 'date',
+            'end_date' => 'date|after:start_date',
+            'status' => 'in:active,completed,canceled',
             'notes' => 'nullable|string',
         ]);
 
-        $placement->update($request->all());
+        $updateData = [];
         
-        // Update company_id di user
-        if ($placement->status === 'active') {
-            User::where('id', $placement->student_id)->update([
-                'company_id' => $placement->company_id
-            ]);
-        } else {
-            User::where('id', $placement->student_id)->update([
-                'company_id' => null
-            ]);
+        if ($request->has('company_id')) {
+            $updateData['company_id'] = $request->company_id;
+        }
+        if ($request->has('teacher_id')) {
+            $updateData['teacher_id'] = $request->teacher_id;  // ← TAMBAHKAN INI
+        }
+        if ($request->has('start_date')) {
+            $updateData['start_date'] = $request->start_date;
+        }
+        if ($request->has('end_date')) {
+            $updateData['end_date'] = $request->end_date;
+        }
+        if ($request->has('status')) {
+            $updateData['status'] = $request->status;
+        }
+        if ($request->has('notes')) {
+            $updateData['notes'] = $request->notes;
+        }
+        
+        $placement->update($updateData);
+        
+        // Update company_id dan teacher_id di user
+        $userUpdate = [];
+        if ($request->has('company_id')) {
+            $userUpdate['company_id'] = $request->company_id;
+        }
+        if ($request->has('teacher_id')) {
+            $userUpdate['teacher_id'] = $request->teacher_id;  // ← TAMBAHKAN INI
+        }
+        
+        if (!empty($userUpdate)) {
+            User::where('id', $placement->student_id)->update($userUpdate);
         }
 
-        return response()->json($placement->load(['student', 'company']));
+        return response()->json($placement->load(['student', 'company', 'teacher']));
     }
 
     public function destroy($id)
     {
         $placement = Placement::findOrFail($id);
         
-        // Reset company_id user
+        // Reset company_id dan teacher_id user
         User::where('id', $placement->student_id)->update([
-            'company_id' => null
+            'company_id' => null,
+            'teacher_id' => null  // ← TAMBAHKAN INI
         ]);
         
         $placement->delete();
