@@ -11,6 +11,7 @@ class Placement extends Model
     protected $fillable = [
         'student_id',
         'company_id',
+        'teacher_id',     // ← TAMBAHKAN INI
         'start_date',
         'end_date',
         'status',
@@ -30,5 +31,11 @@ class Placement extends Model
     public function company()
     {
         return $this->belongsTo(Company::class);
+    }
+    
+    // ← TAMBAHKAN RELASI INI
+    public function teacher()
+    {
+        return $this->belongsTo(User::class, 'teacher_id');
     }
 }

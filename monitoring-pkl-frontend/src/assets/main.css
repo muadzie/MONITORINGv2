@@ -21,15 +21,24 @@ a,
   }
 }
 
+/* PERBAIKAN: Hanya untuk desktop */
 @media (min-width: 1024px) {
   body {
     display: flex;
     place-items: center;
   }
 
-  #app {
+  /* Hapus atau komentari bagian ini */
+  /* #app {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    padding: 0 2rem;
+  } */
+  
+  /* Ganti dengan ini */
+  #app {
+    display: block;
+    width: 100%;
     padding: 0 2rem;
   }
 }
