@@ -19,22 +19,49 @@
 
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white">
-        <p class="text-sm opacity-90">Total Guru</p>
-        <p class="text-2xl font-bold">{{ teachers.length }}</p>
+      <div class="bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl p-5 text-white shadow-lg hover:shadow-xl transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm opacity-90">Total Guru</p>
+            <p class="text-3xl font-bold mt-1">{{ teachers.length }}</p>
+          </div>
+          <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+            </svg>
+          </div>
+        </div>
       </div>
-      <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-4 text-white">
-        <p class="text-sm opacity-90">Guru Aktif</p>
-        <p class="text-2xl font-bold">{{ teachers.filter(t => t.is_active !== false).length }}</p>
+      <div class="bg-gradient-to-br from-green-500 to-green-700 rounded-xl p-5 text-white shadow-lg hover:shadow-xl transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm opacity-90">Guru Aktif</p>
+            <p class="text-3xl font-bold mt-1">{{ teachers.filter(t => t.is_active !== false).length }}</p>
+          </div>
+          <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+          </div>
+        </div>
       </div>
-      <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-4 text-white">
-        <p class="text-sm opacity-90">Total Bimbingan</p>
-        <p class="text-2xl font-bold">{{ totalStudents }}</p>
+      <div class="bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl p-5 text-white shadow-lg hover:shadow-xl transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm opacity-90">Total Bimbingan</p>
+            <p class="text-3xl font-bold mt-1">{{ totalStudents }}</p>
+          </div>
+          <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+            </svg>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Search & Filter -->
-    <div class="bg-white rounded-xl shadow-sm p-4">
+    <div class="bg-white rounded-xl shadow-md p-5 border border-gray-100">
       <div class="flex flex-col md:flex-row gap-4">
         <div class="flex-1 relative">
           <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -43,63 +70,82 @@
           <input 
             v-model="search" 
             type="text" 
-            placeholder="Cari guru (Nama, Email, NIP)..."
-            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            placeholder="Cari guru (Nama, Email, NIP)..." 
+            class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           >
         </div>
-        <button @click="resetSearch" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition">Reset</button>
+        <button @click="resetSearch" class="px-4 py-2.5 text-gray-600 hover:bg-gray-100 rounded-lg transition flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+          Reset
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div v-if="loading" class="flex justify-center py-12">
+      <div class="text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+        <p class="mt-4 text-gray-500">Memuat data guru...</p>
       </div>
     </div>
 
     <!-- Table -->
-    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+    <div v-else-if="filteredTeachers.length > 0" class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
       <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">No</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">NIP</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nama</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">No. Telepon</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Mata Pelajaran</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Jumlah Bimbingan</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Aksi</th>
+        <table class="min-w-[1000px] lg:min-w-full bg-white">
+          <thead>
+            <tr class="bg-gradient-to-r from-indigo-600 to-purple-600">
+              <th class="px-4 py-3 text-center text-xs font-semibold text-white uppercase w-12">No</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-white uppercase w-28">NIP</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-white uppercase w-36">Nama</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-white uppercase w-44">Email</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-white uppercase w-28">No. Telepon</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-white uppercase w-32">Mata Pelajaran</th>
+              <th class="px-4 py-3 text-center text-xs font-semibold text-white uppercase w-24">Jml Bimbingan</th>
+              <th class="px-4 py-3 text-center text-xs font-semibold text-white uppercase w-20">Aksi</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
-            <tr v-for="(teacher, index) in filteredTeachers" :key="teacher.id" class="hover:bg-gray-50 transition">
-              <td class="px-6 py-4 text-sm text-gray-500">{{ index + 1 }}</td>
-              <td class="px-6 py-4 text-sm font-mono text-gray-600">{{ teacher.nip || '-' }}</td>
-              <td class="px-6 py-4 font-medium text-gray-800">
+            <tr v-for="(teacher, index) in filteredTeachers" :key="teacher.id" class="hover:bg-gray-50 transition duration-200">
+              <td class="px-4 py-3 text-sm text-gray-500 text-center">{{ index + 1 }}</td>
+              <td class="px-4 py-3 text-sm font-mono text-gray-600 whitespace-nowrap">{{ teacher.nip || '-' }}</td>
+              <td class="px-4 py-3 font-medium text-gray-800 whitespace-nowrap">
                 <div class="flex items-center gap-2">
-                  <div class="w-8 h-8 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center text-blue-600 font-bold text-sm">
+                  <div class="w-8 h-8 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center text-blue-600 font-bold text-sm shadow-sm">
                     {{ teacher.name?.charAt(0) || 'G' }}
                   </div>
                   {{ teacher.name }}
                 </div>
               </td>
-              <td class="px-6 py-4 text-sm text-gray-600">{{ teacher.email }}</td>
-              <td class="px-6 py-4 text-sm text-gray-600">{{ teacher.phone || '-' }}</td>
-              <td class="px-6 py-4">
-                <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+              <td class="px-4 py-3 text-sm text-gray-600 truncate max-w-xs">{{ teacher.email }}</td>
+              <td class="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">{{ teacher.phone || '-' }}</td>
+              <td class="px-4 py-3">
+                <span class="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-medium">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                  </svg>
                   {{ teacher.mata_pelajaran || 'Umum' }}
                 </span>
               </td>
-              <td class="px-6 py-4">
-                <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+              <td class="px-4 py-3 text-center">
+                <span class="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-lg text-xs font-medium">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                  </svg>
                   {{ teacher.students_count || 0 }} Siswa
                 </span>
               </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-2">
-                  <button @click="editTeacher(teacher)" class="p-1 text-indigo-600 hover:bg-indigo-50 rounded-lg transition" title="Edit">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <td class="px-4 py-3 text-center">
+                <div class="flex items-center justify-center gap-2">
+                  <button @click="editTeacher(teacher)" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition" title="Edit">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                     </svg>
                   </button>
-                  <button @click="deleteTeacher(teacher)" class="p-1 text-red-600 hover:bg-red-50 rounded-lg transition" title="Hapus">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <button @click="deleteTeacher(teacher)" class="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition" title="Hapus">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                     </svg>
                   </button>
@@ -108,11 +154,12 @@
             </tr>
             <tr v-if="filteredTeachers.length === 0 && !loading">
               <td colspan="8" class="px-6 py-12 text-center">
-                <svg class="w-16 h-16 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                 </svg>
-                <p class="text-gray-500">Belum ada data guru</p>
-                <button @click="openModal" class="mt-3 text-indigo-600 hover:underline">Tambah guru pertama</button>
+                <p class="text-gray-500 text-lg">Belum ada data guru</p>
+                <p class="text-sm text-gray-400 mt-1">Silakan tambahkan guru pembimbing</p>
+                <button @click="openModal" class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Tambah guru pertama</button>
               </td>
             </tr>
           </tbody>
@@ -122,12 +169,12 @@
 
     <!-- Modal Tambah/Edit -->
     <div v-if="showModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50" @click.self="closeModal">
-      <div class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-fade-in-up">
-        <div class="sticky top-0 bg-white p-6 border-b rounded-t-2xl">
+      <div class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-fade-in-up shadow-2xl">
+        <div class="sticky top-0 bg-white p-5 border-b rounded-t-2xl">
           <div class="flex justify-between items-center">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                 </svg>
               </div>
@@ -147,47 +194,47 @@
         <form @submit.prevent="submitTeacher" class="p-6 space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
-              <input v-model="form.name" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Budi Santoso" required>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
+              <input v-model="form.name" type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Budi Santoso" required>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">NIP</label>
-              <input v-model="form.nip" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="197501012005011001">
+              <label class="block text-sm font-semibold text-gray-700 mb-1">NIP</label>
+              <input v-model="form.nip" type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="197501012005011001">
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-              <input v-model="form.email" type="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="guru@example.com" required>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Email <span class="text-red-500">*</span></label>
+              <input v-model="form.email" type="email" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="guru@example.com" required>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">No. Telepon</label>
-              <input v-model="form.phone" type="tel" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="08123456789">
+              <label class="block text-sm font-semibold text-gray-700 mb-1">No. Telepon</label>
+              <input v-model="form.phone" type="tel" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="08123456789">
             </div>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Mata Pelajaran</label>
-            <input v-model="form.mata_pelajaran" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="Contoh: Pemrograman Web, TKJ, RPL">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Mata Pelajaran</label>
+            <input v-model="form.mata_pelajaran" type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Contoh: Pemrograman Web, TKJ, RPL">
           </div>
 
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-              <input v-model="form.password" type="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" :required="!isEdit" placeholder="Minimal 6 karakter">
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Password <span v-if="!isEdit" class="text-red-500">*</span></label>
+              <input v-model="form.password" type="password" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" :required="!isEdit" placeholder="Minimal 6 karakter">
               <p v-if="isEdit" class="text-xs text-gray-500 mt-1">Kosongkan jika tidak ingin mengubah password</p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password</label>
-              <input v-model="form.password_confirmation" type="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg" :required="!isEdit" placeholder="Ulangi password">
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Konfirmasi Password <span v-if="!isEdit" class="text-red-500">*</span></label>
+              <input v-model="form.password_confirmation" type="password" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" :required="!isEdit" placeholder="Ulangi password">
             </div>
           </div>
 
           <div class="flex justify-end gap-3 pt-4 border-t">
-            <button type="button" @click="closeModal" class="px-5 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium">Batal</button>
-            <button type="submit" class="px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all font-medium">
-              {{ isEdit ? 'Update' : 'Simpan' }}
+            <button type="button" @click="closeModal" class="px-5 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium">Batal</button>
+            <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all font-medium" :disabled="saving">
+              {{ saving ? 'Menyimpan...' : (isEdit ? 'Update' : 'Simpan') }}
             </button>
           </div>
         </form>
@@ -204,6 +251,7 @@ import { useToast } from 'vue-toastification'
 const toast = useToast()
 const teachers = ref([])
 const loading = ref(false)
+const saving = ref(false)
 const showModal = ref(false)
 const isEdit = ref(false)
 const search = ref('')
@@ -239,8 +287,10 @@ const load = async () => {
   loading.value = true
   try {
     const res = await axios.get('/admin/teachers')
-    teachers.value = res.data
+    teachers.value = res.data.data || res.data || []
+    console.log('Teachers loaded:', teachers.value.length)
   } catch (error) {
+    console.error('Load error:', error)
     toast.error('Gagal memuat data guru')
   } finally {
     loading.value = false
@@ -287,6 +337,12 @@ const submitTeacher = async () => {
     return
   }
   
+  if (!isEdit.value && !form.value.password) {
+    toast.error('Password harus diisi')
+    return
+  }
+  
+  saving.value = true
   try {
     if (isEdit.value) {
       await axios.put(`/admin/teachers/${form.value.id}`, form.value)
@@ -296,9 +352,12 @@ const submitTeacher = async () => {
       toast.success('Guru berhasil ditambahkan')
     }
     closeModal()
-    load()
+    await load()
   } catch (error) {
+    console.error('Submit error:', error)
     toast.error(error.response?.data?.message || 'Gagal menyimpan data')
+  } finally {
+    saving.value = false
   }
 }
 
@@ -307,9 +366,9 @@ const deleteTeacher = async (teacher) => {
     try {
       await axios.delete(`/admin/teachers/${teacher.id}`)
       toast.success('Guru berhasil dihapus')
-      load()
+      await load()
     } catch (error) {
-      toast.error('Gagal menghapus guru')
+      toast.error(error.response?.data?.message || 'Gagal menghapus guru')
     }
   }
 }

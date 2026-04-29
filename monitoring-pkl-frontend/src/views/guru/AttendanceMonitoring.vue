@@ -45,7 +45,7 @@
           <select v-model="filters.student_id" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
             <option value="">📌 Semua Siswa</option>
             <option v-for="student in students" :key="student.id" :value="student.id">
-              👨‍🎓 {{ student.name }} - {{ student.nisn }}
+              {{ student.name }} - {{ student.nisn }}
             </option>
           </select>
         </div>
@@ -84,7 +84,7 @@
       <div class="bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl p-5 text-white shadow-lg">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm opacity-90">Total Kehadiran</p>
+            <p class="text-sm opacity-90">Total</p>
             <p class="text-3xl font-bold mt-1">{{ attendances.length }}</p>
           </div>
           <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
@@ -157,51 +157,42 @@
     <!-- Table -->
     <div v-else-if="filteredAttendances.length > 0" class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
       <div class="overflow-x-auto">
-        <table class="min-w-full bg-white">
+        <table class="min-w-[1000px] lg:min-w-full bg-white">
           <thead>
             <tr class="bg-gradient-to-r from-indigo-600 to-purple-600">
-              <th class="px-5 py-4 text-left text-xs font-semibold text-white uppercase">No</th>
-              <th class="px-5 py-4 text-left text-xs font-semibold text-white uppercase">NISN</th>
-              <th class="px-5 py-4 text-left text-xs font-semibold text-white uppercase">Nama Siswa</th>
-              <th class="px-5 py-4 text-left text-xs font-semibold text-white uppercase">Kelas</th>
-              <th class="px-5 py-4 text-left text-xs font-semibold text-white uppercase">Perusahaan</th>
-              <th class="px-5 py-4 text-left text-xs font-semibold text-white uppercase">Tanggal</th>
-              <th class="px-5 py-4 text-left text-xs font-semibold text-white uppercase">Check In</th>
-              <th class="px-5 py-4 text-left text-xs font-semibold text-white uppercase">Check Out</th>
-              <th class="px-5 py-4 text-left text-xs font-semibold text-white uppercase">Status</th>
-              <th class="px-5 py-4 text-left text-xs font-semibold text-white uppercase">Validasi</th>
+              <th class="px-3 py-3 text-center text-xs font-semibold text-white uppercase w-12">No</th>
+              <th class="px-3 py-3 text-left text-xs font-semibold text-white uppercase w-28">NISN</th>
+              <th class="px-3 py-3 text-left text-xs font-semibold text-white uppercase w-36">Nama Siswa</th>
+              <th class="px-3 py-3 text-left text-xs font-semibold text-white uppercase w-24">Kelas</th>
+              <th class="px-3 py-3 text-left text-xs font-semibold text-white uppercase w-44">Perusahaan</th>
+              <th class="px-3 py-3 text-left text-xs font-semibold text-white uppercase w-28">Tanggal</th>
+              <th class="px-3 py-3 text-center text-xs font-semibold text-white uppercase w-20">Check In</th>
+              <th class="px-3 py-3 text-center text-xs font-semibold text-white uppercase w-20">Check Out</th>
+              <th class="px-3 py-3 text-center text-xs font-semibold text-white uppercase w-24">Status</th>
+              <th class="px-3 py-3 text-center text-xs font-semibold text-white uppercase w-24">Validasi</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
             <tr v-for="(att, index) in filteredAttendances" :key="att.id" class="hover:bg-gray-50 transition">
-              <td class="px-5 py-4 text-sm text-gray-500">{{ index + 1 }}</td>
-              <td class="px-5 py-4 text-sm font-mono text-gray-600">{{ att.student?.nisn || '-' }}</td>
-              <td class="px-5 py-4">
-                <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center text-indigo-600 font-bold text-sm shadow-sm">
-                    {{ att.student?.name?.charAt(0) || 'S' }}
-                  </div>
-                  <span class="font-medium text-gray-800">{{ att.student?.name || '-' }}</span>
-                </div>
-              </td>
-              <td class="px-5 py-4">
-                <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-medium">{{ att.student?.class?.name || '-' }}</span>
-              </td>
-              <td class="px-5 py-4 text-sm text-gray-600">{{ att.company?.name || '-' }}</td>
-              <td class="px-5 py-4 text-sm text-gray-600">{{ formatDate(att.date) }}</td>
-              <td class="px-5 py-4 text-sm font-mono text-green-600">{{ att.check_in || '-' }}</td>
-              <td class="px-5 py-4 text-sm font-mono text-red-600">{{ att.check_out || '-' }}</td>
-              <td class="px-5 py-4">
-                <span :class="getStatusClass(att.status)" class="px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm">
+              <td class="px-3 py-3 text-sm text-gray-500 text-center">{{ index + 1 }}</td>
+              <td class="px-3 py-3 text-sm font-mono text-gray-600 whitespace-nowrap">{{ att.student?.nisn || '-' }}</td>
+              <td class="px-3 py-3 font-medium text-gray-800 whitespace-nowrap">{{ att.student?.name || '-' }}</td>
+              <td class="px-3 py-3 text-sm text-gray-600 whitespace-nowrap">{{ att.student?.class?.name || '-' }}</td>
+              <td class="px-3 py-3 text-sm text-gray-600 truncate max-w-xs">{{ att.company?.name || '-' }}</td>
+              <td class="px-3 py-3 text-sm text-gray-600 whitespace-nowrap">{{ formatDate(att.date) }}</td>
+              <td class="px-3 py-3 text-sm font-mono text-green-600 text-center whitespace-nowrap">{{ att.check_in || '-' }}</td>
+              <td class="px-3 py-3 text-sm font-mono text-red-600 text-center whitespace-nowrap">{{ att.check_out || '-' }}</td>
+              <td class="px-3 py-3 text-center">
+                <span :class="getStatusClass(att.status)" class="px-2 py-1 rounded-full text-xs font-semibold shadow-sm inline-block whitespace-nowrap">
                   {{ getStatusText(att.status) }}
                 </span>
               </td>
-              <td class="px-5 py-4">
-                <span v-if="att.is_valid_location" class="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-lg text-xs">
+              <td class="px-3 py-3 text-center">
+                <span v-if="att.is_valid_location" class="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-lg text-xs whitespace-nowrap">
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                   Valid
                 </span>
-                <span v-else class="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 rounded-lg text-xs">
+                <span v-else class="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 rounded-lg text-xs whitespace-nowrap">
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                   Invalid
                 </span>
@@ -272,11 +263,16 @@ const filteredAttendances = computed(() => {
 // Helper functions
 const formatDate = (date) => {
   if (!date) return '-'
-  return new Date(date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+  return new Date(date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
 const getStatusText = (status) => {
-  const map = { present: '✅ Hadir', late: '⏰ Terlambat', absent: '❌ Alpha', sick: '🤒 Sakit', permit: '📝 Izin' }
+  const map = { present: 'Hadir', late: 'Terlambat', absent: 'Alpha', sick: 'Sakit', permit: 'Izin' }
+  return map[status] || status
+}
+
+const getStatusTextForExport = (status) => {
+  const map = { present: 'Hadir', late: 'Terlambat', absent: 'Alpha', sick: 'Sakit', permit: 'Izin' }
   return map[status] || status
 }
 
@@ -306,6 +302,7 @@ const fetchAttendances = async () => {
   try {
     const res = await axios.get('/guru/attendances')
     attendances.value = res.data.data || res.data || []
+    console.log('Attendances loaded:', attendances.value.length)
   } catch (error) {
     console.error('Fetch attendances error:', error)
     toast.error('Gagal memuat data kehadiran')
@@ -329,10 +326,9 @@ const resetFilters = () => {
   }
 }
 
-// EXPORT TO EXCEL - RAPI DENGAN WARNA
+// Export to Excel
 const exportToExcel = () => {
   try {
-    // Buat HTML table dengan styling untuk Excel
     let htmlContent = `
       <html>
         <head>
@@ -376,7 +372,7 @@ const exportToExcel = () => {
     filteredAttendances.value.forEach((att, index) => {
       const rowBg = index % 2 === 0 ? 'bg-white' : 'bg-gray'
       let statusClass = ''
-      let statusText = getStatusText(att.status).replace(/[✅⏰❌🤒📝]/g, '').trim()
+      let statusText = getStatusTextForExport(att.status)
       
       if (statusText === 'Hadir') statusClass = 'bg-hadir'
       else if (statusText === 'Terlambat') statusClass = 'bg-terlambat'
@@ -387,9 +383,9 @@ const exportToExcel = () => {
       htmlContent += `
         <tr class="${rowBg}">
           <td class="text-center">${index + 1}</td>
-          <td>${att.student?.nisn || '-'}</td>
+          <td class="text-center">${att.student?.nisn || '-'}</td>
           <td>${att.student?.name || '-'}</td>
-          <td>${att.student?.class?.name || '-'}</td>
+          <td class="text-center">${att.student?.class?.name || '-'}</td>
           <td>${att.company?.name || '-'}</td>
           <td class="text-center">${formatDate(att.date)}</td>
           <td class="text-center">${att.check_in || '-'}</td>
@@ -410,7 +406,6 @@ const exportToExcel = () => {
       </html>
     `
     
-    // Download sebagai file .xls
     const blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel' })
     const link = document.createElement('a')
     const url = URL.createObjectURL(blob)
@@ -461,13 +456,13 @@ const exportToPDF = () => {
           <tbody>
             ${filteredAttendances.value.map((att, index) => {
               let statusClass = ''
-              let statusText = getStatusText(att.status).replace(/[✅⏰❌🤒📝]/g, '').trim()
+              let statusText = getStatusTextForExport(att.status)
               if (statusText === 'Hadir') statusClass = 'bg-hadir'
               else if (statusText === 'Terlambat') statusClass = 'bg-terlambat'
               else if (statusText === 'Alpha') statusClass = 'bg-alpha'
               else if (statusText === 'Sakit') statusClass = 'bg-sakit'
               else if (statusText === 'Izin') statusClass = 'bg-izin'
-              return `<tr><td class="text-center">${index+1}</td><td>${att.student?.nisn||'-'}</td><td>${att.student?.name||'-'}</td><td>${att.student?.class?.name||'-'}</td><td>${att.company?.name||'-'}</td><td class="text-center">${formatDate(att.date)}</td><td class="text-center">${att.check_in||'-'}</td><td class="text-center">${att.check_out||'-'}</td><td class="${statusClass} text-center">${statusText}</td><td class="text-center">${att.is_valid_location ? '✓ Valid' : '✗ Invalid'}</td></tr>`
+              return `<tr><td class="text-center">${index+1}</td><td class="text-center">${att.student?.nisn||'-'}</td><td>${att.student?.name||'-'}</td><td class="text-center">${att.student?.class?.name||'-'}</td><td>${att.company?.name||'-'}</td><td class="text-center">${formatDate(att.date)}</td><td class="text-center">${att.check_in||'-'}</td><td class="text-center">${att.check_out||'-'}</td><td class="${statusClass} text-center">${statusText}</td><td class="text-center">${att.is_valid_location ? '✓ Valid' : '✗ Invalid'}</td></tr>`
             }).join('')}
           </tbody>
         </table>

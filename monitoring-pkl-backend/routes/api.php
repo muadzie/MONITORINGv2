@@ -110,12 +110,18 @@ Route::prefix('guru')->middleware('auth:sanctum')->group(function () {
     // Dashboard
     Route::get('/dashboard/stats', [App\Http\Controllers\Api\Guru\DashboardController::class, 'stats']);
     Route::get('/top-students', [App\Http\Controllers\Api\Guru\DashboardController::class, 'topStudents']);
+
+     // MONITORING SISWA - TAMBAHKAN INI
+    Route::get('/monitoring', [App\Http\Controllers\Api\Guru\MonitoringController::class, 'index']);
+    Route::get('/monitoring/{id}', [App\Http\Controllers\Api\Guru\MonitoringController::class, 'show']);
     
     // Monitoring
+     Route::get('/monitoring', [App\Http\Controllers\Api\Guru\MonitoringController::class, 'index']);
     Route::get('/students', [App\Http\Controllers\Api\Guru\MonitoringController::class, 'students']);
     Route::get('/students/{id}', [App\Http\Controllers\Api\Guru\MonitoringController::class, 'show']);
     
     // Logbook Review
+    Route::get('/logbooks', [App\Http\Controllers\Api\Guru\ReviewController::class, 'index']);
     Route::get('/logbooks/pending', [App\Http\Controllers\Api\Guru\ReviewController::class, 'pending']);
     Route::get('/logbooks/{id}', [App\Http\Controllers\Api\Guru\ReviewController::class, 'show']);
     Route::put('/logbooks/{id}/review', [App\Http\Controllers\Api\Guru\ReviewController::class, 'review']);
@@ -150,6 +156,9 @@ Route::get('/attendances/summary', [App\Http\Controllers\Api\Guru\AttendanceCont
 // ================================================================
 // ===================== SISWA ROUTES ===========================
 // ================================================================
+// ================================================================
+// ===================== SISWA ROUTES ===========================
+// ================================================================
 Route::prefix('siswa')->middleware('auth:sanctum')->group(function () {
     
     // Dashboard
@@ -167,8 +176,12 @@ Route::prefix('siswa')->middleware('auth:sanctum')->group(function () {
     // Logbook
     Route::apiResource('logbooks', App\Http\Controllers\Api\Siswa\LogbookController::class);
     
-    // Permission
-    Route::apiResource('permissions', App\Http\Controllers\Api\Siswa\PermissionController::class);
+    // PERMISSION - PERBAIKI INI
+    Route::get('/permissions', [App\Http\Controllers\Api\Siswa\PermissionController::class, 'index']);
+    Route::post('/permissions', [App\Http\Controllers\Api\Siswa\PermissionController::class, 'store']);
+    Route::get('/permissions/{id}', [App\Http\Controllers\Api\Siswa\PermissionController::class, 'show']);
+    Route::put('/permissions/{id}', [App\Http\Controllers\Api\Siswa\PermissionController::class, 'update']);
+    Route::delete('/permissions/{id}', [App\Http\Controllers\Api\Siswa\PermissionController::class, 'destroy']);
     
     // Report (Laporan PKL)
     Route::get('/report', [App\Http\Controllers\Api\Siswa\ReportController::class, 'index']);

@@ -19,26 +19,62 @@
 
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-      <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl p-4 text-white">
-        <p class="text-sm opacity-90">Total Siswa</p>
-        <p class="text-2xl font-bold">{{ students.length }}</p>
+      <div class="bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-xl p-5 text-white shadow-lg hover:shadow-xl transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm opacity-90">Total Siswa</p>
+            <p class="text-3xl font-bold mt-1">{{ students.length }}</p>
+          </div>
+          <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+            </svg>
+          </div>
+        </div>
       </div>
-      <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-4 text-white">
-        <p class="text-sm opacity-90">Sudah Ditempatkan</p>
-        <p class="text-2xl font-bold">{{ students.filter(s => s.company_id).length }}</p>
+      <div class="bg-gradient-to-br from-green-500 to-green-700 rounded-xl p-5 text-white shadow-lg hover:shadow-xl transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm opacity-90">Ditempatkan</p>
+            <p class="text-3xl font-bold mt-1">{{ students.filter(s => s.company_id).length }}</p>
+          </div>
+          <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+            </svg>
+          </div>
+        </div>
       </div>
-      <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl p-4 text-white">
-        <p class="text-sm opacity-90">Belum Ditempatkan</p>
-        <p class="text-2xl font-bold">{{ students.filter(s => !s.company_id).length }}</p>
+      <div class="bg-gradient-to-br from-yellow-500 to-yellow-700 rounded-xl p-5 text-white shadow-lg hover:shadow-xl transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm opacity-90">Belum Ditempatkan</p>
+            <p class="text-3xl font-bold mt-1">{{ students.filter(s => !s.company_id).length }}</p>
+          </div>
+          <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+            </svg>
+          </div>
+        </div>
       </div>
-      <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-4 text-white">
-        <p class="text-sm opacity-90">Aktif</p>
-        <p class="text-2xl font-bold">{{ students.filter(s => s.is_active !== false).length }}</p>
+      <div class="bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl p-5 text-white shadow-lg hover:shadow-xl transition-all duration-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm opacity-90">Aktif</p>
+            <p class="text-3xl font-bold mt-1">{{ students.filter(s => s.is_active !== false).length }}</p>
+          </div>
+          <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Search & Filter -->
-    <div class="bg-white rounded-xl shadow-sm p-4">
+    <div class="bg-white rounded-xl shadow-md p-5 border border-gray-100">
       <div class="flex flex-col md:flex-row gap-4">
         <div class="flex-1 relative">
           <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -47,62 +83,88 @@
           <input 
             v-model="search" 
             type="text" 
-            placeholder="Cari siswa (NISN, Nama, Email)..."
-            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            placeholder="Cari siswa (NISN, Nama, Email)..." 
+            class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           >
         </div>
-        <select v-model="filters.company" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
-          <option value="">Semua Perusahaan</option>
-          <option v-for="c in companies" :key="c.id" :value="c.id">{{ c.name }}</option>
+        <select v-model="filters.company" class="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white">
+          <option value="">📌 Semua Perusahaan</option>
+          <option v-for="c in companies" :key="c.id" :value="c.id">🏢 {{ c.name }}</option>
         </select>
-        <button @click="resetFilters" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition">Reset</button>
+        <button @click="resetFilters" class="px-4 py-2.5 text-gray-600 hover:bg-gray-100 rounded-lg transition flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+          Reset
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div v-if="loading" class="flex justify-center py-12">
+      <div class="text-center">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+        <p class="mt-4 text-gray-500">Memuat data siswa...</p>
       </div>
     </div>
 
     <!-- Table -->
-    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+    <div v-else-if="filteredStudents.length > 0" class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
       <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">No</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">NISN</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Nama</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Email</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Perusahaan</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-              <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Aksi</th>
+        <table class="min-w-[900px] lg:min-w-full bg-white">
+          <thead>
+            <tr class="bg-gradient-to-r from-indigo-600 to-purple-600">
+              <th class="px-4 py-3 text-center text-xs font-semibold text-white uppercase w-12">No</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-white uppercase w-28">NISN</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-white uppercase w-36">Nama</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-white uppercase w-44">Email</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-white uppercase w-40">Perusahaan</th>
+              <th class="px-4 py-3 text-center text-xs font-semibold text-white uppercase w-20">Status</th>
+              <th class="px-4 py-3 text-center text-xs font-semibold text-white uppercase w-20">Aksi</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
-            <tr v-for="(student, index) in filteredStudents" :key="student.id" class="hover:bg-gray-50 transition">
-              <td class="px-6 py-4 text-sm text-gray-500">{{ index + 1 }}</td>
-              <td class="px-6 py-4 text-sm font-medium">{{ student.nisn }}</td>
-              <td class="px-6 py-4 font-medium text-gray-800">{{ student.name }}</td>
-              <td class="px-6 py-4 text-sm text-gray-600">{{ student.email }}</td>
-              <td class="px-6 py-4">
-                <span v-if="student.company" class="inline-flex items-center gap-1 px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs">
+            <tr v-for="(student, index) in filteredStudents" :key="student.id" class="hover:bg-gray-50 transition duration-200">
+              <td class="px-4 py-3 text-sm text-gray-500 text-center">{{ index + 1 }}</td>
+              <td class="px-4 py-3 text-sm font-mono text-gray-600 whitespace-nowrap">{{ student.nisn }}</td>
+              <td class="px-4 py-3 font-medium text-gray-800 whitespace-nowrap">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center text-indigo-600 font-bold text-sm shadow-sm">
+                    {{ student.name?.charAt(0) || 'S' }}
+                  </div>
+                  {{ student.name }}
+                </div>
+              </td>
+              <td class="px-4 py-3 text-sm text-gray-600 truncate max-w-xs">{{ student.email }}</td>
+              <td class="px-4 py-3">
+                <span v-if="student.company" class="inline-flex items-center gap-1 px-2 py-1 bg-indigo-100 text-indigo-800 rounded-lg text-xs font-medium">
                   <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                   </svg>
                   {{ student.company.name }}
                 </span>
-                <span v-else class="px-2 py-1 bg-gray-100 text-gray-500 rounded-full text-xs">Belum ditempatkan</span>
+                <span v-else class="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-500 rounded-lg text-xs">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  Belum ditempatkan
+                </span>
               </td>
-              <td class="px-6 py-4">
-                <span class="px-2 py-1 rounded-full text-xs" :class="student.is_active !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+              <td class="px-4 py-3 text-center">
+                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium" :class="student.is_active !== false ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
+                  <span class="w-1.5 h-1.5 rounded-full" :class="student.is_active !== false ? 'bg-green-500' : 'bg-red-500'"></span>
                   {{ student.is_active !== false ? 'Aktif' : 'Nonaktif' }}
                 </span>
               </td>
-              <td class="px-6 py-4">
-                <div class="flex items-center gap-2">
-                  <button @click="editStudent(student)" class="p-1 text-indigo-600 hover:bg-indigo-50 rounded-lg transition" title="Edit">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <td class="px-4 py-3 text-center">
+                <div class="flex items-center justify-center gap-2">
+                  <button @click="editStudent(student)" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition" title="Edit">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                     </svg>
                   </button>
-                  <button @click="deleteStudent(student)" class="p-1 text-red-600 hover:bg-red-50 rounded-lg transition" title="Hapus">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <button @click="deleteStudent(student)" class="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition" title="Hapus">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                     </svg>
                   </button>
@@ -111,11 +173,12 @@
             </tr>
             <tr v-if="filteredStudents.length === 0 && !loading">
               <td colspan="7" class="px-6 py-12 text-center">
-                <svg class="w-16 h-16 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                 </svg>
-                <p class="text-gray-500">Belum ada data siswa</p>
-                <button @click="openModal" class="mt-3 text-indigo-600 hover:underline">Tambah siswa pertama</button>
+                <p class="text-gray-500 text-lg">Belum ada data siswa</p>
+                <p class="text-sm text-gray-400 mt-1">Silakan tambahkan siswa baru</p>
+                <button @click="openModal" class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Tambah siswa pertama</button>
               </td>
             </tr>
           </tbody>
@@ -125,12 +188,12 @@
 
     <!-- Modal Tambah/Edit -->
     <div v-if="showModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50" @click.self="closeModal">
-      <div class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-fade-in-up">
-        <div class="sticky top-0 bg-white p-6 border-b rounded-t-2xl">
+      <div class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-fade-in-up shadow-2xl">
+        <div class="sticky top-0 bg-white p-5 border-b rounded-t-2xl">
           <div class="flex justify-between items-center">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
-                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                 </svg>
               </div>
@@ -150,50 +213,50 @@
         <form @submit.prevent="submitStudent" class="p-6 space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">NISN</label>
-              <input v-model="form.nisn" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="0012345678" required>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">NISN <span class="text-red-500">*</span></label>
+              <input v-model="form.nisn" type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="0012345678" required>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
-              <input v-model="form.name" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="Ahmad Fauzi" required>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
+              <input v-model="form.name" type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Ahmad Fauzi" required>
             </div>
           </div>
 
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-              <input v-model="form.email" type="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="siswa@example.com" required>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Email <span class="text-red-500">*</span></label>
+              <input v-model="form.email" type="email" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="siswa@example.com" required>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">No. Telepon</label>
-              <input v-model="form.phone" type="tel" class="w-full px-4 py-2 border border-gray-300 rounded-lg" placeholder="08123456789">
+              <label class="block text-sm font-semibold text-gray-700 mb-1">No. Telepon</label>
+              <input v-model="form.phone" type="tel" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="08123456789">
             </div>
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Perusahaan PKL</label>
-            <select v-model="form.company_id" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">Perusahaan PKL</label>
+            <select v-model="form.company_id" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white">
               <option value="">-- Pilih Perusahaan --</option>
-              <option v-for="c in companies" :key="c.id" :value="c.id">{{ c.name }}</option>
+              <option v-for="c in companies" :key="c.id" :value="c.id">🏢 {{ c.name }}</option>
             </select>
           </div>
 
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
-              <input v-model="form.password" type="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" :required="!isEdit" placeholder="Minimal 6 karakter">
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Password <span v-if="!isEdit" class="text-red-500">*</span></label>
+              <input v-model="form.password" type="password" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" :required="!isEdit" placeholder="Minimal 6 karakter">
               <p v-if="isEdit" class="text-xs text-gray-500 mt-1">Kosongkan jika tidak ingin mengubah password</p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password</label>
-              <input v-model="form.password_confirmation" type="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg" :required="!isEdit" placeholder="Ulangi password">
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Konfirmasi Password <span v-if="!isEdit" class="text-red-500">*</span></label>
+              <input v-model="form.password_confirmation" type="password" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" :required="!isEdit" placeholder="Ulangi password">
             </div>
           </div>
 
           <div class="flex justify-end gap-3 pt-4 border-t">
-            <button type="button" @click="closeModal" class="px-5 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium">Batal</button>
-            <button type="submit" class="px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all font-medium">
-              {{ isEdit ? 'Update' : 'Simpan' }}
+            <button type="button" @click="closeModal" class="px-5 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium">Batal</button>
+            <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all font-medium" :disabled="saving">
+              {{ saving ? 'Menyimpan...' : (isEdit ? 'Update' : 'Simpan') }}
             </button>
           </div>
         </form>
@@ -211,6 +274,7 @@ const toast = useToast()
 const students = ref([])
 const companies = ref([])
 const loading = ref(false)
+const saving = ref(false)
 const showModal = ref(false)
 const isEdit = ref(false)
 const search = ref('')
@@ -240,7 +304,7 @@ const filteredStudents = computed(() => {
   }
   
   if (filters.value.company) {
-    result = result.filter(s => s.company_id === filters.value.company)
+    result = result.filter(s => s.company_id === parseInt(filters.value.company))
   }
   
   return result
@@ -253,9 +317,10 @@ const load = async () => {
       axios.get('/admin/students'),
       axios.get('/companies')
     ])
-    students.value = studentsRes.data
-    companies.value = companiesRes.data
+    students.value = studentsRes.data.data || studentsRes.data || []
+    companies.value = companiesRes.data.data || companiesRes.data || []
   } catch (error) {
+    console.error('Load error:', error)
     toast.error('Gagal memuat data')
   } finally {
     loading.value = false
@@ -302,6 +367,12 @@ const submitStudent = async () => {
     return
   }
   
+  if (!isEdit.value && !form.value.password) {
+    toast.error('Password harus diisi')
+    return
+  }
+  
+  saving.value = true
   try {
     if (isEdit.value) {
       await axios.put(`/admin/students/${form.value.id}`, form.value)
@@ -311,9 +382,12 @@ const submitStudent = async () => {
       toast.success('Siswa berhasil ditambahkan')
     }
     closeModal()
-    load()
+    await load()
   } catch (error) {
+    console.error('Submit error:', error)
     toast.error(error.response?.data?.message || 'Gagal menyimpan data')
+  } finally {
+    saving.value = false
   }
 }
 
@@ -322,9 +396,9 @@ const deleteStudent = async (student) => {
     try {
       await axios.delete(`/admin/students/${student.id}`)
       toast.success('Siswa berhasil dihapus')
-      load()
+      await load()
     } catch (error) {
-      toast.error('Gagal menghapus siswa')
+      toast.error(error.response?.data?.message || 'Gagal menghapus siswa')
     }
   }
 }
