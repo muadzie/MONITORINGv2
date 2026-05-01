@@ -195,9 +195,6 @@
               <router-link to="/admin/monitoring/progress" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-gray-100 hover:text-indigo-600 transition">
                 <span>📈</span> Progress Siswa
               </router-link>
-              <router-link to="/admin/monitoring/map" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-500 hover:bg-gray-100 hover:text-indigo-600 transition">
-                <span>🗺️</span> Monitoring Map
-              </router-link>
             </div>
           </transition>
         </div>

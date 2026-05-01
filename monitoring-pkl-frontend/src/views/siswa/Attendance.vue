@@ -217,14 +217,25 @@ const loadTodayStatus = async () => {
     const response = await axios.get('/siswa/attendance/today')
     console.log('Today status:', response.data)
     
+    // Log untuk debugging
+    const today = new Date().toISOString().split('T')[0]
+    console.log('Hari ini tanggal:', today)
+    console.log('Permission date:', response.data.permission_date)
+    
     if (response.data.is_permission_day) {
-      isPermissionDay.value = true
-      permissionType.value = response.data.permission_type
-      permissionReason.value = response.data.permission_reason
-      statusText.value = permissionType.value === 'sick' ? '🤒 Sakit' : '📝 Izin'
-      hasCheckedIn.value = false
-      hasCheckedOut.value = false
-      toast.info(`Hari ini Anda sedang ${permissionType.value === 'sick' ? 'SAKIT' : 'IZIN'}. Tidak perlu absen.`)
+      // Verifikasi tanggal permission
+      if (response.data.permission_date && response.data.permission_date !== today) {
+        console.warn('Permission date mismatch, ignoring...')
+        isPermissionDay.value = false
+        permissionType.value = ''
+        permissionReason.value = ''
+      } else {
+        isPermissionDay.value = true
+        permissionType.value = response.data.permission_type
+        permissionReason.value = response.data.permission_reason
+        statusText.value = permissionType.value === 'sick' ? '🤒 Sakit' : '📝 Izin'
+        toast.info(`Hari ini Anda sedang ${permissionType.value === 'sick' ? 'SAKIT' : 'IZIN'}. Tidak perlu absen.`)
+      }
     } else {
       isPermissionDay.value = false
       hasCheckedIn.value = response.data.has_checked_in || false

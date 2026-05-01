@@ -91,6 +91,10 @@
           <option value="">📌 Semua Perusahaan</option>
           <option v-for="c in companies" :key="c.id" :value="c.id">🏢 {{ c.name }}</option>
         </select>
+        <select v-model="filters.teacher" class="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white">
+          <option value="">👨‍🏫 Semua Guru Pembimbing</option>
+          <option v-for="g in teachers" :key="g.id" :value="g.id">👨‍🏫 {{ g.name }} - {{ g.nip || '-' }}</option>
+        </select>
         <button @click="resetFilters" class="px-4 py-2.5 text-gray-600 hover:bg-gray-100 rounded-lg transition flex items-center gap-2">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -111,7 +115,7 @@
     <!-- Table -->
     <div v-else-if="filteredStudents.length > 0" class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
       <div class="overflow-x-auto">
-        <table class="min-w-[900px] lg:min-w-full bg-white">
+        <table class="min-w-[1000px] lg:min-w-full bg-white">
           <thead>
             <tr class="bg-gradient-to-r from-indigo-600 to-purple-600">
               <th class="px-4 py-3 text-center text-xs font-semibold text-white uppercase w-12">No</th>
@@ -119,6 +123,7 @@
               <th class="px-4 py-3 text-left text-xs font-semibold text-white uppercase w-36">Nama</th>
               <th class="px-4 py-3 text-left text-xs font-semibold text-white uppercase w-44">Email</th>
               <th class="px-4 py-3 text-left text-xs font-semibold text-white uppercase w-40">Perusahaan</th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-white uppercase w-40">Guru Pembimbing</th>
               <th class="px-4 py-3 text-center text-xs font-semibold text-white uppercase w-20">Status</th>
               <th class="px-4 py-3 text-center text-xs font-semibold text-white uppercase w-20">Aksi</th>
             </tr>
@@ -150,6 +155,20 @@
                   Belum ditempatkan
                 </span>
               </td>
+              <td class="px-4 py-3">
+                <span v-if="student.teacher" class="inline-flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-800 rounded-lg text-xs font-medium">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                  </svg>
+                  {{ student.teacher.name }}
+                </span>
+                <span v-else class="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-500 rounded-lg text-xs">
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  Belum ada guru pembimbing
+                </span>
+              </td>
               <td class="px-4 py-3 text-center">
                 <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium" :class="student.is_active !== false ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
                   <span class="w-1.5 h-1.5 rounded-full" :class="student.is_active !== false ? 'bg-green-500' : 'bg-red-500'"></span>
@@ -172,7 +191,7 @@
               </td>
             </tr>
             <tr v-if="filteredStudents.length === 0 && !loading">
-              <td colspan="7" class="px-6 py-12 text-center">
+              <td colspan="8" class="px-6 py-12 text-center">
                 <svg class="w-20 h-20 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                 </svg>
@@ -233,12 +252,33 @@
             </div>
           </div>
 
-          <div>
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Perusahaan PKL</label>
-            <select v-model="form.company_id" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white">
-              <option value="">-- Pilih Perusahaan --</option>
-              <option v-for="c in companies" :key="c.id" :value="c.id">🏢 {{ c.name }}</option>
-            </select>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Perusahaan PKL</label>
+              <select v-model="form.company_id" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white">
+                <option value="">-- Pilih Perusahaan --</option>
+                <option v-for="c in companies" :key="c.id" :value="c.id">🏢 {{ c.name }}</option>
+              </select>
+              <p class="text-xs text-gray-500 mt-1 mt-1">* Kosongkan jika belum ditempatkan</p>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">Guru Pembimbing</label>
+              <select v-model="form.teacher_id" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white">
+                <option value="">-- Pilih Guru Pembimbing --</option>
+                <option v-for="g in teachers" :key="g.id" :value="g.id">👨‍🏫 {{ g.name }} {{ g.nip ? `(${g.nip})` : '' }}</option>
+              </select>
+              <p class="text-xs text-gray-500 mt-1">* Pilih guru yang membimbing siswa ini</p>
+            </div>
+          </div>
+
+          <!-- Info tambahan jika perusahaan dan guru dipilih -->
+          <div v-if="form.company_id && form.teacher_id" class="bg-green-50 border border-green-200 rounded-lg p-3">
+            <div class="flex items-center gap-2 text-green-700 text-sm">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span>Siswa akan ditempatkan di <strong>{{ getSelectedCompanyName() }}</strong> dengan guru pembimbing <strong>{{ getSelectedTeacherName() }}</strong></span>
+            </div>
           </div>
 
           <div class="grid grid-cols-2 gap-4">
@@ -273,12 +313,13 @@ import { useToast } from 'vue-toastification'
 const toast = useToast()
 const students = ref([])
 const companies = ref([])
+const teachers = ref([])
 const loading = ref(false)
 const saving = ref(false)
 const showModal = ref(false)
 const isEdit = ref(false)
 const search = ref('')
-const filters = ref({ company: '' })
+const filters = ref({ company: '', teacher: '' })
 
 const form = ref({
   id: null,
@@ -287,9 +328,21 @@ const form = ref({
   email: '',
   phone: '',
   company_id: '',
+  teacher_id: '',
   password: '',
   password_confirmation: ''
 })
+
+// Helper functions
+const getSelectedCompanyName = () => {
+  const company = companies.value.find(c => c.id === parseInt(form.value.company_id))
+  return company ? company.name : ''
+}
+
+const getSelectedTeacherName = () => {
+  const teacher = teachers.value.find(t => t.id === parseInt(form.value.teacher_id))
+  return teacher ? teacher.name : ''
+}
 
 const filteredStudents = computed(() => {
   let result = students.value
@@ -307,25 +360,45 @@ const filteredStudents = computed(() => {
     result = result.filter(s => s.company_id === parseInt(filters.value.company))
   }
   
+  if (filters.value.teacher) {
+    result = result.filter(s => s.teacher_id === parseInt(filters.value.teacher))
+  }
+  
   return result
 })
 
 const load = async () => {
   loading.value = true
   try {
-    const [studentsRes, companiesRes] = await Promise.all([
+    const [studentsRes, companiesRes, teachersRes] = await Promise.all([
       axios.get('/admin/students'),
-      axios.get('/companies')
+      axios.get('/companies'),
+      axios.get('/admin/teachers')  // ← UBAH INI: gunakan endpoint yang benar
     ])
+    
     students.value = studentsRes.data.data || studentsRes.data || []
     companies.value = companiesRes.data.data || companiesRes.data || []
+    
+    // Handle response teachers
+    if (teachersRes.data.data) {
+      teachers.value = teachersRes.data.data
+    } else if (Array.isArray(teachersRes.data)) {
+      teachers.value = teachersRes.data
+    } else {
+      teachers.value = []
+    }
+    
+    console.log('Teachers loaded:', teachers.value) // Debugging
+    
   } catch (error) {
     console.error('Load error:', error)
-    toast.error('Gagal memuat data')
+    toast.error('Gagal memuat data: ' + (error.response?.data?.message || error.message))
   } finally {
     loading.value = false
   }
 }
+
+// Fungsi lainnya tetap sama (openModal, editStudent, closeModal, submitStudent, deleteStudent, resetFilters)
 
 const openModal = () => {
   isEdit.value = false
@@ -336,6 +409,7 @@ const openModal = () => {
     email: '',
     phone: '',
     company_id: '',
+    teacher_id: '',
     password: '',
     password_confirmation: ''
   }
@@ -351,6 +425,7 @@ const editStudent = (student) => {
     email: student.email,
     phone: student.phone || '',
     company_id: student.company_id || '',
+    teacher_id: student.teacher_id || '',
     password: '',
     password_confirmation: ''
   }
@@ -372,6 +447,11 @@ const submitStudent = async () => {
     return
   }
   
+  if (form.value.password && form.value.password.length < 6) {
+    toast.error('Password minimal 6 karakter')
+    return
+  }
+  
   saving.value = true
   try {
     if (isEdit.value) {
@@ -385,7 +465,8 @@ const submitStudent = async () => {
     await load()
   } catch (error) {
     console.error('Submit error:', error)
-    toast.error(error.response?.data?.message || 'Gagal menyimpan data')
+    const errorMsg = error.response?.data?.message || error.response?.data?.errors || 'Gagal menyimpan data'
+    toast.error(typeof errorMsg === 'string' ? errorMsg : 'Gagal menyimpan data')
   } finally {
     saving.value = false
   }
@@ -406,6 +487,7 @@ const deleteStudent = async (student) => {
 const resetFilters = () => {
   search.value = ''
   filters.value.company = ''
+  filters.value.teacher = ''
 }
 
 onMounted(() => {

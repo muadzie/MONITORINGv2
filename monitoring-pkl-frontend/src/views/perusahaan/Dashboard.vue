@@ -16,7 +16,7 @@
               </div>
               <div class="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2">
                 <p class="text-xs opacity-75">Periode PKL</p>
-                <p class="font-bold text-sm">Januari - Maret 2026</p>
+                <p class="font-bold text-sm">Januari - Juni 2026</p>
               </div>
               <div class="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2">
                 <p class="text-xs opacity-75">Hari ini</p>
@@ -99,10 +99,6 @@
             <h3 class="font-semibold text-gray-800">Aktivitas Logbook</h3>
             <p class="text-sm text-gray-500">7 hari terakhir</p>
           </div>
-          <select v-model="chartPeriod" class="text-sm border rounded-lg px-3 py-1.5 bg-gray-50">
-            <option value="week">Minggu Ini</option>
-            <option value="month">Bulan Ini</option>
-          </select>
         </div>
         <div ref="logbookChart" class="h-64"></div>
       </div>
@@ -129,11 +125,8 @@
               <p class="font-bold text-purple-600">{{ student.logbook_count || 0 }}</p>
               <p class="text-xs text-gray-500">Logbook</p>
             </div>
-            <router-link :to="`/perusahaan/assessment/${student.id}`" class="px-3 py-1 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 transition">
-              Nilai
-            </router-link>
           </div>
-          <div v-if="!topStudents.length" class="text-center py-8 text-gray-500">
+          <div v-if="topStudents.length === 0" class="text-center py-8 text-gray-500">
             <UserGroupIcon class="w-12 h-12 mx-auto text-gray-300 mb-2" />
             <p>Belum ada siswa magang</p>
           </div>
@@ -155,18 +148,17 @@
           <div class="flex justify-between items-start">
             <div class="flex-1">
               <div class="flex items-center gap-2">
-                <p class="font-medium text-gray-800">{{ log.user_name }}</p>
+                <p class="font-medium text-gray-800">{{ log.student?.name || '-' }}</p>
                 <span class="text-xs text-gray-400">{{ log.date }}</span>
               </div>
               <p class="text-sm text-gray-600 mt-1">{{ log.activity }}</p>
-              <p class="text-xs text-gray-400 mt-1">Diajukan: {{ formatDate(log.created_at) }}</p>
             </div>
-            <router-link :to="`/perusahaan/assessment/${log.user_id}`" class="px-3 py-1 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 transition">
+            <router-link :to="`/perusahaan/assessment`" class="px-3 py-1 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 transition">
               Nilai
             </router-link>
           </div>
         </div>
-        <div v-if="!pendingLogbooks.length" class="p-8 text-center text-gray-500">
+        <div v-if="pendingLogbooks.length === 0" class="p-8 text-center text-gray-500">
           <CheckCircleIcon class="w-12 h-12 mx-auto text-green-300 mb-2" />
           <p>Semua logbook sudah dinilai</p>
         </div>
@@ -221,8 +213,7 @@ const authStore = useAuthStore()
 // State
 const stats = ref({ students: 0, logbooks: 0, pending_assessment: 0, average_grade: 0 })
 const topStudents = ref([])
-const pendingLogbooks = ref([])
-const chartPeriod = ref('week')
+const pendingLogbooks = ref([])  // ← PASTIKAN INI ARRAY
 const currentTime = ref('')
 const currentDate = ref('')
 const currentDay = ref('')
@@ -240,11 +231,6 @@ const updateDateTime = () => {
 }
 
 // Helper functions
-const formatDate = (date) => {
-  if (!date) return '-'
-  return new Date(date).toLocaleDateString('id-ID')
-}
-
 const getTopStudentColor = (index) => {
   const colors = ['bg-yellow-500 text-white', 'bg-gray-400 text-white', 'bg-orange-500 text-white', 'bg-blue-500 text-white', 'bg-green-500 text-white']
   return colors[index] || 'bg-gray-300 text-gray-700'
@@ -254,27 +240,36 @@ const getTopStudentColor = (index) => {
 const fetchDashboardStats = async () => {
   try {
     const res = await axios.get('/perusahaan/dashboard/stats')
+    console.log('Dashboard stats:', res.data)
     stats.value = res.data
   } catch (error) {
     console.error('Failed to fetch dashboard stats:', error)
+    stats.value = { students: 0, logbooks: 0, pending_assessment: 0, average_grade: 0 }
   }
 }
 
 const fetchTopStudents = async () => {
   try {
     const res = await axios.get('/perusahaan/top-students')
-    topStudents.value = res.data
+    console.log('Top students:', res.data)
+    topStudents.value = res.data.data || res.data || []
   } catch (error) {
     console.error('Failed to fetch top students:', error)
+    topStudents.value = []
   }
 }
 
 const fetchPendingLogbooks = async () => {
   try {
     const res = await axios.get('/perusahaan/logbooks/pending')
-    pendingLogbooks.value = res.data
+    console.log('Pending logbooks:', res.data)
+    // PASTIKAN MENGAMBIL ARRAY
+    const data = res.data.data || res.data || []
+    pendingLogbooks.value = Array.isArray(data) ? data : []
+    console.log('Pending logbooks count:', pendingLogbooks.value.length)
   } catch (error) {
     console.error('Failed to fetch pending logbooks:', error)
+    pendingLogbooks.value = []
   }
 }
 
@@ -288,10 +283,13 @@ const initLogbookChart = () => {
       xAxis: { type: 'category', data: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'], axisLabel: { fontSize: 12 } },
       yAxis: { type: 'value', name: 'Jumlah Logbook' },
       series: [{
-        type: 'line', data: [5, 8, 12, 9, 15, 6, 4], smooth: true,
+        type: 'line', 
+        data: [5, 8, 12, 9, 15, 6, 4], 
+        smooth: true,
         lineStyle: { color: '#a855f7', width: 3 },
         areaStyle: { opacity: 0.1, color: '#a855f7' },
-        symbol: 'circle', symbolSize: 8,
+        symbol: 'circle', 
+        symbolSize: 8,
         itemStyle: { color: '#a855f7' }
       }]
     })

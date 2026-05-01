@@ -20,10 +20,12 @@ class AttendanceController extends Controller
 
         $user = $request->user();
         $today = Carbon::today()->format('Y-m-d');
+        
+        // Isi absensi sebelumnya (alpha)
         $this->fillPreviousAbsences($user->id, $today);
         
         // ============================================================
-        // CEK APAKAH SISWA MEMILIKI IZIN/SAKIT PADA TANGGAL INI
+        // CEK APAKAH SISWA MEMILIKI IZIN/SAKIT PADA TANGGAL HARI INI
         // ============================================================
         $permission = Permission::where('user_id', $user->id)
             ->where('date', $today)
@@ -34,7 +36,7 @@ class AttendanceController extends Controller
             $typeText = $permission->type === 'sick' ? 'SAKIT' : 'IZIN';
             return response()->json([
                 'success' => false,
-                'message' => "Anda memiliki pengajuan {$typeText} pada tanggal ini yang telah disetujui. Tidak perlu melakukan absensi.",
+                'message' => "Anda memiliki pengajuan {$typeText} pada tanggal {$today} yang telah disetujui. Tidak perlu melakukan absensi.",
                 'permission' => [
                     'type' => $permission->type,
                     'reason' => $permission->reason,
@@ -128,7 +130,7 @@ class AttendanceController extends Controller
         $today = Carbon::today()->format('Y-m-d');
         
         // ============================================================
-        // CEK APAKAH SISWA MEMILIKI IZIN/SAKIT PADA TANGGAL INI
+        // CEK APAKAH SISWA MEMILIKI IZIN/SAKIT PADA TANGGAL HARI INI
         // ============================================================
         $permission = Permission::where('user_id', $user->id)
             ->where('date', $today)
@@ -139,7 +141,7 @@ class AttendanceController extends Controller
             $typeText = $permission->type === 'sick' ? 'SAKIT' : 'IZIN';
             return response()->json([
                 'success' => false,
-                'message' => "Anda memiliki pengajuan {$typeText} pada tanggal ini yang telah disetujui. Tidak perlu melakukan absensi."
+                'message' => "Anda memiliki pengajuan {$typeText} pada tanggal {$today} yang telah disetujui. Tidak perlu melakukan absensi."
             ], 400);
         }
 
@@ -177,7 +179,7 @@ class AttendanceController extends Controller
         $user = $request->user();
         $today = Carbon::today()->format('Y-m-d');
         
-        // Cek izin/sakit
+        // Cek izin/sakit HANYA UNTUK HARI INI
         $permission = Permission::where('user_id', $user->id)
             ->where('date', $today)
             ->where('status', 'approved')
@@ -191,7 +193,8 @@ class AttendanceController extends Controller
                 'is_permission_day' => true,
                 'permission_type' => $permission->type,
                 'permission_reason' => $permission->reason,
-                'message' => "Hari ini Anda sedang {$permission->type}"
+                'permission_date' => $permission->date,
+                'message' => "Hari ini Anda sedang " . ($permission->type === 'sick' ? 'SAKIT' : 'IZIN')
             ]);
         }
         
@@ -236,54 +239,59 @@ class AttendanceController extends Controller
     }
 
     private function fillPreviousAbsences($userId, $currentDate)
-{
-    // Ambil tanggal mulai PKL (dari placement)
-    $placement = Placement::where('student_id', $userId)
-        ->where('status', 'active')
-        ->first();
-    
-    if (!$placement) {
-        return;
-    }
-    
-    $startDate = Carbon::parse($placement->start_date);
-    $endDate = Carbon::parse($currentDate)->subDay();
-    
-    if ($startDate > $endDate) {
-        return;
-    }
-    
-    for ($date = clone $startDate; $date <= $endDate; $date->addDay()) {
-        $dateStr = $date->format('Y-m-d');
+    {
+        // Ambil tanggal mulai PKL (dari placement)
+        $placement = Placement::where('student_id', $userId)
+            ->where('status', 'active')
+            ->first();
         
-        // Cek apakah sudah ada attendance
-        $exists = Attendance::where('user_id', $userId)
-            ->where('date', $dateStr)
-            ->exists();
+        if (!$placement) {
+            return;
+        }
         
-        if (!$exists) {
-            // Cek apakah ada izin/sakit
-            $permission = Permission::where('user_id', $userId)
+        $startDate = Carbon::parse($placement->start_date);
+        $endDate = Carbon::parse($currentDate)->subDay();
+        
+        if ($startDate > $endDate) {
+            return;
+        }
+        
+        for ($date = clone $startDate; $date <= $endDate; $date->addDay()) {
+            $dateStr = $date->format('Y-m-d');
+            
+            // Lewati hari libur (Sabtu/Minggu) - opsional
+            if ($date->isWeekend()) {
+                continue;
+            }
+            
+            // Cek apakah sudah ada attendance
+            $exists = Attendance::where('user_id', $userId)
                 ->where('date', $dateStr)
-                ->where('status', 'approved')
                 ->exists();
             
-            if (!$permission) {
-                // Buat alpha
-                Attendance::create([
-                    'user_id' => $userId,
-                    'company_id' => $placement->company_id,
-                    'date' => $dateStr,
-                    'status' => 'absent',
-                    'notes' => 'Tidak hadir tanpa keterangan (auto generated)',
-                    'is_valid_location' => false,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ]);
+            if (!$exists) {
+                // Cek apakah ada izin/sakit untuk tanggal itu
+                $permission = Permission::where('user_id', $userId)
+                    ->where('date', $dateStr)
+                    ->where('status', 'approved')
+                    ->exists();
                 
-                \Log::info("Auto filled absent for user {$userId} on {$dateStr}");
+                if (!$permission) {
+                    // Buat alpha
+                    Attendance::create([
+                        'user_id' => $userId,
+                        'company_id' => $placement->company_id,
+                        'date' => $dateStr,
+                        'status' => 'absent',
+                        'notes' => 'Tidak hadir tanpa keterangan',
+                        'is_valid_location' => false,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
+                    ]);
+                    
+                    \Log::info("Auto filled absent for user {$userId} on {$dateStr}");
+                }
             }
         }
     }
-}
 }

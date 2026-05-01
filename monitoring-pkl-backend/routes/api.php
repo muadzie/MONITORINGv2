@@ -66,6 +66,7 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
     Route::get('/monitoring/map', [App\Http\Controllers\Api\Admin\MonitoringController::class, 'map']);
     Route::get('/students/{id}', [App\Http\Controllers\Api\Admin\MonitoringController::class, 'show']);
     
+    
     // ---------------------- MAPS -------------------------------
     Route::get('/map/data', [App\Http\Controllers\Api\Admin\MapController::class, 'getMapData']);
     Route::get('/map/companies', [App\Http\Controllers\Api\Admin\MapController::class, 'getCompanyLocations']);
@@ -92,6 +93,9 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
     Route::post('/settings/radius', [App\Http\Controllers\Api\Admin\SettingController::class, 'updateRadius']);
 
     Route::get('/admin/students/stats', [App\Http\Controllers\Api\Admin\StudentController::class, 'stats']);
+        // Tambahkan ini untuk options guru
+    Route::get('/teachers/options', [App\Http\Controllers\Api\Admin\TeacherController::class, 'options']);
+
 });
 
 // ================================================================

@@ -55,7 +55,7 @@ class MonitoringController extends Controller
         }
     }
 
-       public function progress(Request $request)
+    public function progress(Request $request)
     {
         try {
             $query = User::where('role_id', 2)
@@ -98,7 +98,7 @@ class MonitoringController extends Controller
     public function attendance(Request $request)
     {
         try {
-            $query = Attendance::with(['user', 'company'])
+            $query = Attendance::with(['user', 'user.company', 'user.class'])  // ← TAMBAHKAN RELASI
                 ->whereBetween('date', [$request->start_date ?? '2026-01-01', $request->end_date ?? Carbon::now()]);
             
             if ($request->status) {
@@ -107,33 +107,100 @@ class MonitoringController extends Controller
             
             $attendances = $query->orderBy('date', 'desc')->get();
             
-            return response()->json($attendances);
+            // Format response dengan data lengkap
+            $formattedData = $attendances->map(function($attendance) {
+                return [
+                    'id' => $attendance->id,
+                    'date' => $attendance->date,
+                    'check_in' => $attendance->check_in,
+                    'check_out' => $attendance->check_out,
+                    'status' => $attendance->status,
+                    'notes' => $attendance->notes,
+                    'user' => $attendance->user ? [
+                        'id' => $attendance->user->id,
+                        'name' => $attendance->user->name,
+                        'nisn' => $attendance->user->nisn,
+                        'kelas' => $attendance->user->kelas,
+                        'email' => $attendance->user->email,
+                    ] : null,
+                    'company' => $attendance->user && $attendance->user->company ? [
+                        'id' => $attendance->user->company->id,
+                        'name' => $attendance->user->company->name,
+                        'address' => $attendance->user->company->address,
+                    ] : null,
+                    'class' => $attendance->user && $attendance->user->class ? [
+                        'id' => $attendance->user->class->id,
+                        'name' => $attendance->user->class->name,
+                        'jurusan' => $attendance->user->class->jurusan,
+                    ] : null,
+                ];
+            });
+            
+            return response()->json([
+                'success' => true,
+                'data' => $formattedData
+            ]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
     
-    public function logbook(Request $request)
-    {
-        try {
-            $query = Logbook::with('user')
-                ->whereBetween('date', [$request->start_date ?? '2026-01-01', $request->end_date ?? Carbon::now()]);
-            
-            if ($request->status) {
-                $query->where('status', $request->status);
-            }
-            
-            $logbooks = $query->orderBy('date', 'desc')->get();
-            
-            return response()->json($logbooks);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+   public function logbook(Request $request)
+{
+    try {
+        // Load relasi user beserta company dan class
+        $query = Logbook::with(['user', 'user.company', 'user.class'])
+            ->whereBetween('date', [$request->start_date ?? '2026-01-01', $request->end_date ?? Carbon::now()]);
+        
+        if ($request->status) {
+            $query->where('status', $request->status);
         }
+        
+        $logbooks = $query->orderBy('date', 'desc')->get();
+        
+        // Format response dengan data lengkap termasuk kelas
+        $formattedData = $logbooks->map(function($logbook) {
+            return [
+                'id' => $logbook->id,
+                'date' => $logbook->date,
+                'activity' => $logbook->activity,
+                'description' => $logbook->description,
+                'status' => $logbook->status,
+                'grade' => $logbook->grade,
+                'feedback' => $logbook->feedback,
+                'attachment' => $logbook->attachment,
+                'created_at' => $logbook->created_at,
+                'user' => $logbook->user ? [
+                    'id' => $logbook->user->id,
+                    'name' => $logbook->user->name,
+                    'nisn' => $logbook->user->nisn,
+                    // Ambil kelas dari relasi class atau langsung dari field kelas
+                    'kelas' => $logbook->user->class ? $logbook->user->class->name : ($logbook->user->kelas ?? '-'),
+                    'email' => $logbook->user->email,
+                    'phone' => $logbook->user->phone,
+                ] : null,
+                'company' => $logbook->user && $logbook->user->company ? [
+                    'id' => $logbook->user->company->id,
+                    'name' => $logbook->user->company->name,
+                    'address' => $logbook->user->company->address,
+                ] : null,
+                'class' => $logbook->user && $logbook->user->class ? [
+                    'id' => $logbook->user->class->id,
+                    'name' => $logbook->user->class->name,
+                    'jurusan' => $logbook->user->class->jurusan,
+                ] : null,
+            ];
+        });
+        
+        return response()->json([
+            'success' => true,
+            'data' => $formattedData
+        ]);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
     }
+}
 
-
-    
-    
     public function show($id)
     {
         try {

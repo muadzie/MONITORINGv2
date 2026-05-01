@@ -2,7 +2,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
 const routes = [
-  // ============= PUBLIC ROUTES =============
+  // ================================================================
+  // ===================== PUBLIC ROUTES ===========================
+  // ================================================================
   {
     path: '/',
     name: 'Landing',
@@ -22,64 +24,43 @@ const routes = [
     meta: { guest: true } 
   },
 
-  // ============= ADMIN ROUTES =============
+  // ================================================================
+  // ===================== ADMIN ROUTES ============================
+  // ================================================================
   { 
     path: '/admin', 
     component: () => import('../layouts/AdminLayout.vue'), 
     meta: { auth: true, role: 'Admin' },
     children: [
-      // Dashboard
       { path: 'dashboard', component: () => import('../views/admin/Dashboard.vue') },
-      
-      // Manajemen User
       { path: 'users', component: () => import('../views/admin/Users.vue') },
       { path: 'roles', component: () => import('../views/admin/Roles.vue') },
-      
-      // Data Master
       { path: 'students', component: () => import('../views/admin/Students.vue') },
       { path: 'teachers', component: () => import('../views/admin/Teachers.vue') },
       { path: 'companies', component: () => import('../views/admin/Companies.vue') },
       { path: 'classes', component: () => import('../views/admin/Classes.vue') },
-      
-      // Penempatan PKL
       { path: 'placements', component: () => import('../views/admin/Placements.vue') },
-      { path: 'placements/create', component: () => import('../views/admin/Placements.vue') },
-      { path: 'placements/map', component: () => import('../views/admin/Placements.vue') },
-      
-      // Monitoring
-     { path: 'monitoring/attendance', component: () => import('../views/admin/monitoring/Attendance.vue') },
-{ path: 'monitoring/logbook', component: () => import('../views/admin/monitoring/Logbook.vue') },
-{ path: 'monitoring/progress', component: () => import('../views/admin/monitoring/Progress.vue') },
-      { path: 'monitoring/map', component: () => import('../views/admin/Monitoring.vue') },
-      
-      // Laporan
+      { path: 'map', component: () => import('../views/admin/MapDistribution.vue') },
+      { path: 'monitoring/attendance', component: () => import('../views/admin/monitoring/Attendance.vue') },
+      { path: 'monitoring/logbook', component: () => import('../views/admin/monitoring/Logbook.vue') },
+      { path: 'monitoring/progress', component: () => import('../views/admin/monitoring/Progress.vue') },
       { path: 'reports/attendance', component: () => import('../views/admin/Reports.vue') },
       { path: 'reports/logbook', component: () => import('../views/admin/Reports.vue') },
       { path: 'reports/grade', component: () => import('../views/admin/Reports.vue') },
       { path: 'reports/summary', component: () => import('../views/admin/Reports.vue') },
-      
-      // Penilaian
       { path: 'assessments', component: () => import('../views/admin/Assessments.vue') },
-      { path: 'assessments/report', component: () => import('../views/admin/Assessments.vue') },
-      
-      // Pengaturan
       { path: 'settings/general', component: () => import('../views/admin/Settings.vue') },
       { path: 'settings/school', component: () => import('../views/admin/Settings.vue') },
       { path: 'settings/academic', component: () => import('../views/admin/Settings.vue') },
       { path: 'settings/radius', component: () => import('../views/admin/Settings.vue') },
-      
-      // Profile
       { path: 'profile', component: () => import('../views/shared/Profile.vue') },
-      
-      // Default redirect
-      { path: '', redirect: '/admin/dashboard' },
-
-      // Map routes
-      { path: 'map', component: () => import('../views/admin/MapDistribution.vue') },
+      { path: '', redirect: '/admin/dashboard' }
     ] 
   },
 
-  // ============= SISWA ROUTES =============
+  // ================================================================
+  // ===================== SISWA ROUTES ============================
+  // ================================================================
   { 
     path: '/siswa', 
     component: () => import('../layouts/SiswaLayout.vue'), 
@@ -89,7 +70,7 @@ const routes = [
       { path: 'attendance', component: () => import('../views/siswa/Attendance.vue') },
       { path: 'logbook', component: () => import('../views/siswa/Logbook.vue') },
       { path: 'permission', component: () => import('../views/siswa/Permission.vue') },
-       { path: 'report', component: () => import('../views/siswa/Report.vue') },  
+      { path: 'report', component: () => import('../views/siswa/Report.vue') },
       { path: 'final-report', component: () => import('../views/siswa/FinalReport.vue') },
       { path: 'company', component: () => import('../views/siswa/CompanyInfo.vue') },
       { path: 'guide', component: () => import('../views/siswa/Guide.vue') },
@@ -99,7 +80,9 @@ const routes = [
     ] 
   },
 
-  // ============= GURU ROUTES =============
+  // ================================================================
+  // ===================== GURU ROUTES =============================
+  // ================================================================
   { 
     path: '/guru', 
     component: () => import('../layouts/GuruLayout.vue'), 
@@ -113,14 +96,16 @@ const routes = [
       { path: 'permissions', component: () => import('../views/guru/PermissionApproval.vue') },
       { path: 'assessment', component: () => import('../views/guru/Assessment.vue') },
       { path: 'reports', component: () => import('../views/guru/Reports.vue') },
+      { path: 'rekap-absensi', component: () => import('../views/guru/RekapAbsensi.vue') },
       { path: 'notifications', component: () => import('../views/shared/Notifications.vue') },
       { path: 'profile', component: () => import('../views/shared/Profile.vue') },
-      { path: '', redirect: '/guru/dashboard' },
-      { path: 'rekap-absensi',component: () => import('../views/guru/RekapAbsensi.vue')}
+      { path: '', redirect: '/guru/dashboard' }
     ] 
   },
 
-  // ============= PERUSAHAAN ROUTES =============
+  // ================================================================
+  // ===================== PERUSAHAAN ROUTES ========================
+  // ================================================================
   { 
     path: '/perusahaan', 
     component: () => import('../layouts/PerusahaanLayout.vue'), 
@@ -129,13 +114,17 @@ const routes = [
       { path: 'dashboard', component: () => import('../views/perusahaan/Dashboard.vue') },
       { path: 'assessment', component: () => import('../views/perusahaan/Assessment.vue') },
       { path: 'progress', component: () => import('../views/perusahaan/Progress.vue') },
-      { path: 'notifications', component: () => import('../views/shared/Notifications.vue') },
+      { path: 'report', component: () => import('../views/perusahaan/Report.vue') },
       { path: 'profile', component: () => import('../views/shared/Profile.vue') },
-      { path: '', redirect: '/perusahaan/dashboard' }
+      { path: '', redirect: '/perusahaan/dashboard' },
+      { path: 'assessment/:id', component: () => import('../views/perusahaan/AssessmentDetail.vue') },
+{ path: 'progress/:id', component: () => import('../views/perusahaan/ProgressDetail.vue') },
     ] 
   },
 
-  // ============= FALLBACK ROUTE =============
+  // ================================================================
+  // ===================== FALLBACK ROUTE ==========================
+  // ================================================================
   { path: '/:pathMatch(.*)*', redirect: '/' }
 ]
 
@@ -144,27 +133,20 @@ const router = createRouter({
   routes 
 })
 
-// Navigation Guard - DIPERBAIKI
+// ================================================================
+// ===================== NAVIGATION GUARD =========================
+// ================================================================
 router.beforeEach(async (to, from, next) => {
   const token = localStorage.getItem('token')
   const authStore = useAuthStore()
   
-   // Jika ada token tapi belum login, cek auth
+  // Jika ada token tapi belum login, cek auth
   if (token && !authStore.isAuthenticated) {
     await authStore.checkAuth()
   }
   
   const isLoggedIn = !!token && authStore.isAuthenticated
   const userRole = authStore.role ? String(authStore.role).toLowerCase() : null
-  
-  console.log('Navigation:', { 
-    to: to.path, 
-    isLoggedIn, 
-    userRole, 
-    metaRole: to.meta.role,
-    metaAuth: to.meta.auth,
-    metaGuest: to.meta.guest
-  })
   
   // Guest routes (landing, login, register)
   if (to.meta.guest) {
