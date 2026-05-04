@@ -79,22 +79,6 @@
           </button>
         </form>
 
-        <!-- Demo Credentials -->
-        <div class="mt-6 p-4 bg-gray-50 rounded-lg">
-          <p class="text-xs text-gray-500 text-center mb-2">Akun Demo</p>
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <div class="text-gray-500">Admin:</div>
-            <div class="text-gray-700 font-mono">admin@smkn1subang.sch.id</div>
-            <div class="text-gray-500">Guru:</div>
-            <div class="text-gray-700 font-mono">guru@smkn1subang.sch.id</div>
-            <div class="text-gray-500">Siswa:</div>
-            <div class="text-gray-700 font-mono">ahmadfauzi@student.com</div>
-            <div class="text-gray-500">Perusahaan:</div>
-            <div class="text-gray-700 font-mono">perusahaan1@example.com</div>
-          </div>
-          <p class="text-center text-xs text-gray-500 mt-2">Password: <span class="font-mono">password</span></p>
-        </div>
-
         <!-- Tombol Daftar dan Kembali ke Beranda -->
         <div class="mt-6 space-y-3">
           <router-link 
