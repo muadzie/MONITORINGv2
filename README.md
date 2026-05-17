@@ -611,7 +611,7 @@ V2server2/
       <td align="center">
         <strong>Ilham Muadz Fakhrizi</strong><br>
         <em>Pengembang & Desainer Sistem</em><br>
-        <a href="mailto:muadzie@gmail.com">muadzie@gmail.com</a>
+        <a href="mailto:ilhammuadz133@gmail.com">ilhammuadz133@gmail.com</a>
       </td>
     </tr>
   </table>
@@ -621,7 +621,7 @@ V2server2/
 
 | Nama | Peran | Kontak |
 |------|-------|--------|
-| **Ilham Muadz Fakhrizi** | Full-Stack Developer & System Designer | muadzie@gmail.com |
+| **Ilham Muadz Fakhrizi** | Full-Stack Developer & System Designer | ilhammuadz133@gmail.com |
 
 ### Tech Stack Attribution
 
