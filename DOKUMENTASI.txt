@@ -1,0 +1,280 @@
+================================================================================
+                          DOKUMENTASI SISTEM
+               MONITORING PKL SMKN 1 SUBANG (MONITORINGv2)
+================================================================================
+
+1. INFORMASI UMUM
+--------------------------------------------------------------------------------
+   Nama Aplikasi  : MONITORINGv2 - Sistem Monitoring PKL
+   Institusi      : SMKN 1 Subang
+   Versi          : 2.0
+   Tahun          : 2026
+   Platform       : Web Application (SPA)
+   Tujuan         : Mendigitalisasi seluruh proses monitoring Praktik Kerja
+                    Lapangan (PKL) siswa SMKN 1 Subang secara real-time.
+
+
+2. FITUR UTAMA
+--------------------------------------------------------------------------------
+
+   A. Manajemen Pengguna
+      - Multi-role: Admin, Siswa, Guru, dan Perusahaan (DUDI)
+      - Registrasi dengan sistem approval
+      - Manajemen profil lengkap (foto, password, dll.)
+
+   B. Absensi Berbasis GPS (Geofencing)
+      - Check-in dan check-out menggunakan lokasi real-time
+      - Validasi radius menggunakan rumus Haversine
+      - Batasan radius yang dapat dikonfigurasi
+      - Foto saat check-in/check-out
+      - Status: Hadir, Terlambat, Alpha, Sakit, Izin
+
+   C. Jurnal Harian (Logbook)
+      - Catatan kegiatan harian siswa selama PKL
+      - Lampiran file (gambar, PDF, dokumen)
+      - Review dan penilaian oleh Guru & Perusahaan
+      - Status: Pending, Disetujui, Ditolak
+
+   D. Perizinan & Sakit
+      - Pengajuan izin/sakit dengan bukti lampiran
+      - Approval oleh Guru pembimbing
+      - Riwayat pengajuan lengkap
+
+   E. Penempatan Siswa (Placement)
+      - Penugasan siswa ke perusahaan tertentu
+      - Penunjukan guru pembimbing
+      - Periode PKL (tanggal mulai & selesai)
+
+   F. Penilaian Multidimensi
+      - Nilai Absensi
+      - Nilai Logbook
+      - Nilai Laporan
+      - Sikap
+      - Kinerja
+      - Kedisiplinan
+      - Penilaian oleh Guru & Perusahaan
+
+   G. Peta Sebaran Interaktif
+      - Visualisasi lokasi perusahaan di peta (Leaflet)
+      - Sebaran siswa per perusahaan
+      - Informasi detail setiap titik lokasi
+
+   H. Laporan & Ekspor Excel
+      - Rekap absensi
+      - Rekap logbook
+      - Ringkasan siswa
+      - Nilai akhir
+      - Format file: Excel (.xlsx)
+
+   I. Notifikasi In-App
+      - Pemberitahuan real-time
+      - Approval/penolakan registrasi
+      - Pengingat kegiatan
+
+   J. Laporan Akhir PKL
+      - Upload laporan akhir (file)
+      - Review oleh Guru pembimbing
+      - Riwayat revisi
+
+
+3. TEKNOLOGI YANG DIGUNAKAN
+--------------------------------------------------------------------------------
+
+   Backend:
+   - PHP 8.3
+   - Laravel 11
+   - MySQL 8.x
+   - Laravel Sanctum (Autentikasi API)
+   - Maatwebsite/Laravel-Excel (Ekspor Excel)
+
+   Frontend:
+   - Vue.js 3 (Composition API)
+   - Pinia (State Management)
+   - Vue Router 4 (Routing SPA)
+   - Tailwind CSS 3 (Styling)
+   - ApexCharts, Chart.js, ECharts (Grafik)
+   - Leaflet (Peta Interaktif)
+   - Axios (HTTP Client)
+   - Vite (Build Tool)
+
+   Algoritma:
+   - Haversine Formula (validasi jarak geofencing)
+
+
+4. STRUKTUR DATABASE
+--------------------------------------------------------------------------------
+
+   monitoring_pkl
+   ├── roles           -> Role pengguna (Admin, Siswa, Guru, Perusahaan)
+   ├── users           -> Seluruh pengguna (polimorfik)
+   ├── companies       -> Data perusahaan (DUDI)
+   ├── classes         -> Data kelas & jurusan
+   ├── placements      -> Penempatan siswa ke perusahaan
+   ├── attendances     -> Data absensi (check-in/out)
+   ├── logbooks        -> Jurnal harian siswa
+   ├── permissions     -> Pengajuan izin/sakit
+   ├── assessments     -> Penilaian multidimensi
+   ├── reports         -> Upload laporan PKL
+   ├── final_reports   -> Laporan akhir PKL
+   └── notifications   -> Notifikasi in-app
+
+
+5. ROLE & HAK AKSES
+--------------------------------------------------------------------------------
+
+   Admin (Role ID: 1)
+   - Dashboard statistik lengkap
+   - CRUD semua data (pengguna, perusahaan, kelas, dll.)
+   - Monitoring absensi, logbook, progres siswa
+   - Peta sebaran interaktif
+   - Approval registrasi
+   - Konfigurasi sistem
+   - Ekspor laporan Excel
+
+   Siswa (Role ID: 2)
+   - Dashboard personal
+   - Absensi GPS (check-in/out)
+   - Jurnal harian (CRUD + lampiran)
+   - Pengajuan izin/sakit
+   - Upload laporan
+   - Lihat info perusahaan & pembimbing
+
+   Guru (Role ID: 3)
+   - Dashboard monitoring siswa bimbingan
+   - Review & approval logbook
+   - Approval izin/sakit
+   - Penilaian siswa
+   - Review laporan
+   - Ekspor laporan Excel
+
+   Perusahaan (Role ID: 4)
+   - Dashboard progres siswa
+   - Penilaian logbook
+   - Monitoring aktivitas siswa
+   - Ekspor laporan
+
+
+6. CARA INSTALASI & MENJALANKAN
+--------------------------------------------------------------------------------
+
+   Prasyarat:
+   - PHP >= 8.3
+   - Composer
+   - Node.js & npm
+   - MySQL 8.x
+   - Laragon / XAMPP / WAMP
+
+   Langkah-langkah:
+
+   1. Clone repositori
+      git clone <repository-url>
+      cd monitoring-pkl-backend
+
+   2. Install dependensi backend
+      composer install
+
+   3. Konfigurasi environment
+      cp .env.example .env
+      - Sesuaikan konfigurasi database di file .env
+      DB_DATABASE=monitoring_pkl
+      DB_USERNAME=root
+      DB_PASSWORD=
+
+   4. Generate key aplikasi
+      php artisan key:generate
+
+   5. Buat database
+      mysql -u root -e "CREATE DATABASE monitoring_pkl"
+
+   6. Jalankan migrasi
+      php artisan migrate
+
+   7. (Opsional) Import data awal
+      php artisan db:seed
+
+   8. Install dependensi frontend
+      cd ../monitoring-pkl-frontend
+      npm install
+
+   9. Jalankan aplikasi
+      Terminal 1: php artisan serve (di folder backend)
+      Terminal 2: npm run dev (di folder frontend)
+
+   Akses:
+   - Frontend: http://localhost:5173
+   - Backend API: http://localhost:8000/api
+
+
+7. ENDPOINT API UTAMA
+--------------------------------------------------------------------------------
+
+   Public:
+   POST /api/login                  -> Login
+   POST /api/register/siswa         -> Registrasi siswa
+   POST /api/register/guru          -> Registrasi guru
+   POST /api/register/perusahaan    -> Registrasi perusahaan
+
+   Admin (/api/admin):
+   GET    /dashboard/stats          -> Statistik dashboard
+   CRUD   /users                    -> Manajemen pengguna
+   CRUD   /students                 -> Manajemen siswa
+   CRUD   /teachers                 -> Manajemen guru
+   CRUD   /companies                -> Manajemen perusahaan
+   CRUD   /classes                  -> Manajemen kelas
+   CRUD   /placements               -> Manajemen penempatan
+   GET    /map                      -> Data peta sebaran
+   GET    /registrations/pending    -> Registrasi pending
+   POST   /registrations/approve    -> Approval registrasi
+   GET    /reports/*                -> Ekspor laporan
+
+   Siswa (/api/siswa):
+   GET    /dashboard/stats          -> Statistik personal
+   POST   /attendance/check-in      -> Check-in
+   POST   /attendance/check-out     -> Check-out
+   CRUD   /logbooks                 -> Jurnal harian
+   CRUD   /permissions              -> Izin/sakit
+   CRUD   /final-reports            -> Laporan akhir
+   GET    /company                  -> Info perusahaan
+
+   Guru (/api/guru):
+   GET    /dashboard/stats          -> Statistik dashboard
+   GET    /logbooks/pending         -> Logbook pending
+   POST   /logbooks/approve         -> Approve logbook
+   GET    /permissions/pending      -> Izin pending
+   POST   /permissions/approve      -> Approve izin
+   CRUD   /assessments              -> Penilaian siswa
+
+
+8. ALGORITMA GEOFENCING (Haversine Formula)
+--------------------------------------------------------------------------------
+
+   Rumus yang digunakan untuk memvalidasi jarak antara lokasi siswa
+   dengan lokasi perusahaan saat absensi:
+
+   a = sin²(��lat/2) + cos(lat1) * cos(lat2) * sin²(��long/2)
+   c = 2 * atan2(��a, ��(1-a))
+   d = R * c
+
+   Keterangan:
+   - R = Radius bumi (6371 km)
+   - lat1, long1 = Koordinat siswa
+   - lat2, long2 = Koordinat perusahaan
+   - d = Jarak antara dua titik
+
+   Jika d <= radius yang ditentukan -> Lokasi valid (dapat absensi)
+
+
+9. SCREENSHOT APLIKASI
+--------------------------------------------------------------------------------
+
+   File-file screenshot tersedia di folder /foto:
+   - beranda.png              -> Halaman utama/landing page
+   - absensi_radius.png       -> Fitur absensi dengan geofencing
+   - peta_sebaran.png         -> Peta sebaran siswa interaktif
+   - dashboard_admin.png      -> Dashboard admin
+
+
+================================================================================
+                   -- DOKUMENTASI TEKNIS MONITORINGv2 --
+              SMKN 1 SUBANG | Sistem Informasi Monitoring PKL
+================================================================================

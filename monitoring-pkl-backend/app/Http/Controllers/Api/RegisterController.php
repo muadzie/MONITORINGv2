@@ -58,7 +58,7 @@ class RegisterController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6|confirmed',
-            'nip' => 'required|string|unique:users,nomor_induk',
+            'nip' => 'required|string|unique:users,nip',
             'phone' => 'nullable|string|max:15',
             'mata_pelajaran' => 'nullable|string'
         ]);
@@ -71,7 +71,7 @@ class RegisterController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'nomor_induk' => $request->nip,
+            'nip' => $request->nip,
             'phone' => $request->phone,
             'role_id' => 3, // role guru
             'registration_status' => 'pending',
@@ -109,20 +109,24 @@ class RegisterController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role_id' => 4, // role perusahaan
+            'bidang_usaha' => $request->bidang_usaha,
+            'kontak_person' => $request->kontak_person,
+            'phone' => $request->telepon,
             'registration_status' => 'pending',
             'is_active' => false
         ]);
 
         // Simpan data perusahaan ke tabel perusahaan
         $perusahaan = \App\Models\Company::create([
-            'user_id' => $user->id,
             'name' => $request->nama_perusahaan,
             'address' => $request->alamat,
             'phone' => $request->telepon,
-            'bidang_usaha' => $request->bidang_usaha,
-            'kontak_person' => $request->kontak_person,
             'email' => $request->email,
+            'description' => $request->bidang_usaha,
         ]);
+
+        // Hubungkan user dengan perusahaan
+        $user->update(['company_id' => $perusahaan->id]);
 
         $this->sendNotificationToAdmin($user, 'Perusahaan');
 

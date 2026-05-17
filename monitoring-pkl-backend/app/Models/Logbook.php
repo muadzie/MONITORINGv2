@@ -11,7 +11,6 @@ class Logbook extends Model
     
     protected $fillable = [
         'user_id',
-        'siswa_id',
         'date',
         'activity',
         'description',
@@ -29,11 +28,6 @@ class Logbook extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
-    }
-    
-    public function siswa()
-    {
-        return $this->belongsTo(User::class, 'siswa_id');
     }
     
     public function getAttachmentUrlAttribute()

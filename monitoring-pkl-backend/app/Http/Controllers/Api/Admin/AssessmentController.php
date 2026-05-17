@@ -23,24 +23,19 @@ class AssessmentController extends Controller
             ->select('id', 'name', 'nisn', 'email', 'kelas', 'class_id', 'company_id', 'teacher_id')
             ->get();
         
+        $studentIds = $students->pluck('id');
+
+        // Batch query semua assessment
+        $allAssessments = Assessment::whereIn('student_id', $studentIds)
+            ->get()
+            ->groupBy('student_id');
+
         $result = [];
         foreach ($students as $student) {
-            // Ambil assessment dari guru
-            $guruAssessment = Assessment::where('student_id', $student->id)
-                ->where('assessor_type', 'guru')
-                ->first();
-            
-            // Ambil assessment dari perusahaan
-            $perusahaanAssessment = Assessment::where('student_id', $student->id)
-                ->where('assessor_type', 'perusahaan')
-                ->first();
-            
-            // LOG untuk debugging
-            Log::info('Student: ' . $student->name . ' (ID: ' . $student->id . ')');
-            Log::info('Perusahaan Assessment found: ' . ($perusahaanAssessment ? 'YES' : 'NO'));
-            if ($perusahaanAssessment) {
-                Log::info('Perusahaan Score: ' . $perusahaanAssessment->performance_score);
-            }
+            $studentAssessments = $allAssessments->get($student->id, collect());
+
+            $guruAssessment = $studentAssessments->where('assessor_type', 'guru')->first();
+            $perusahaanAssessment = $studentAssessments->where('assessor_type', 'perusahaan')->first();
             
             // Hitung nilai guru
             $guruScore = null;
@@ -60,14 +55,6 @@ class AssessmentController extends Controller
             if ($perusahaanAssessment) {
                 // Ambil dari performance_score atau final_score
                 $perusahaanScore = $perusahaanAssessment->performance_score ?? $perusahaanAssessment->final_score;
-            } else {
-                // Fallback: cek dari logbook
-                $avgLogbookGrade = Logbook::where('user_id', $student->id)
-                    ->whereNotNull('grade')
-                    ->avg('grade');
-                if ($avgLogbookGrade) {
-                    $perusahaanScore = round($avgLogbookGrade, 2);
-                }
             }
             
             // Nilai akhir (rata-rata guru dan perusahaan)
@@ -79,7 +66,7 @@ class AssessmentController extends Controller
             } elseif ($perusahaanScore) {
                 $finalScore = $perusahaanScore;
             }
-            
+
             $result[] = [
                 'id' => $student->id,
                 'nisn' => $student->nisn ?? '-',
@@ -121,7 +108,7 @@ class AssessmentController extends Controller
     } catch (\Exception $e) {
         Log::error('Get students error: ' . $e->getMessage());
         return response()->json([
-            'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            'message' => 'Terjadi kesalahan saat mengambil data penilaian'
         ], 500);
     }
 }
@@ -132,8 +119,6 @@ class AssessmentController extends Controller
     public function store(Request $request, $id)
     {
         try {
-            Log::info('Saving assessment for student: ' . $id);
-            Log::info('Request data: ', $request->all());
             
             // Validasi
             $request->validate([
@@ -232,12 +217,11 @@ class AssessmentController extends Controller
         } catch (\Exception $e) {
             Log::error('Store assessment error: ' . $e->getMessage());
             return response()->json([
-                'message' => 'Gagal menyimpan penilaian: ' . $e->getMessage()
+                'message' => 'Gagal menyimpan penilaian'
             ], 500);
         }
     }
 
-    
     
     /**
      * Get assessment report

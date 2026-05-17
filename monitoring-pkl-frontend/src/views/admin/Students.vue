@@ -372,7 +372,7 @@ const load = async () => {
   try {
     const [studentsRes, companiesRes, teachersRes] = await Promise.all([
       axios.get('/admin/students'),
-      axios.get('/companies'),
+      axios.get('/admin/companies'),
       axios.get('/admin/teachers')  // ← UBAH INI: gunakan endpoint yang benar
     ])
     

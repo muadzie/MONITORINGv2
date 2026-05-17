@@ -38,18 +38,28 @@ class AuthController extends Controller
     ]);
 }
 
-  public function me(Request $request)
-{
-    $user = $request->user()->load('role', 'company');
-    
-    return response()->json([
-        'id' => $user->id,
-        'name' => $user->name,
-        'email' => $user->email,
-        'role' => $user->role ? $user->role->name : null,  // Pastikan ini string
-        'company' => $user->company,
-        'phone' => $user->phone,
-        'nisn' => $user->nisn,
-    ]);
-}
+    public function me(Request $request)
+    {
+        $user = $request->user()->load('role', 'company');
+        
+        return response()->json([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role ? $user->role->name : null,
+            'company' => $user->company,
+            'phone' => $user->phone,
+            'nisn' => $user->nisn,
+        ]);
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Logout berhasil'
+        ]);
+    }
 }

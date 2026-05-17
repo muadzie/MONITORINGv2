@@ -15,7 +15,7 @@ class TeacherController extends Controller
     {
         $teachers = User::where('role_id', 3)
             ->select('id', 'name', 'email', 'nip', 'phone', 'mata_pelajaran', 'created_at')
-            ->withCount('students') // students() dari supervisedStudents
+            ->withCount('supervisedStudents')
             ->orderBy('name')
             ->get();
         

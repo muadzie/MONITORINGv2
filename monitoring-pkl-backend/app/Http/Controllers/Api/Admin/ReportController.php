@@ -135,12 +135,10 @@ class ReportController extends Controller
 
             return response()->download($tempFile, $filename)->deleteFileAfterSend(true);
 
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json(['error' => 'Validasi gagal: ' . json_encode($e->errors())], 422);
         } catch (\Exception $e) {
             Log::error('Attendance export error: ' . $e->getMessage());
             Log::error($e->getTraceAsString());
-            return response()->json(['error' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Terjadi kesalahan saat mengexport data absensi'], 500);
         }
     }
 
@@ -160,7 +158,7 @@ class ReportController extends Controller
             Log::error('Attendance JSON error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => 'Terjadi kesalahan saat mengambil data absensi',
                 'data' => []
             ], 500);
         }
@@ -171,12 +169,10 @@ class ReportController extends Controller
      */
     private function getAttendanceData(Request $request)
     {
-        // Set default jika tidak ada
         $start_date = $request->start_date ?? Carbon::now()->startOfMonth()->toDateString();
         $end_date = $request->end_date ?? Carbon::now()->toDateString();
 
-        // Query siswa
-        $query = User::where('role_id', 2); // role siswa
+        $query = User::where('role_id', 2);
 
         if ($request->filled('company_id')) {
             $query->where('company_id', $request->company_id);
@@ -187,12 +183,15 @@ class ReportController extends Controller
 
         $students = $query->with(['company', 'class'])->get();
 
+        // Batch query semua attendance
+        $allAttendances = Attendance::whereIn('user_id', $students->pluck('id'))
+            ->whereBetween('date', [$start_date, $end_date])
+            ->get()
+            ->groupBy('user_id');
+
         $data = [];
         foreach ($students as $student) {
-            // Hitung absensi
-            $attendances = Attendance::where('user_id', $student->id)
-                ->whereBetween('date', [$start_date, $end_date])
-                ->get();
+            $attendances = $allAttendances->get($student->id, collect());
 
             $hadir = $attendances->where('status', 'present')->count();
             $terlambat = $attendances->where('status', 'late')->count();
@@ -280,7 +279,7 @@ class ReportController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Logbook export error: ' . $e->getMessage());
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Terjadi kesalahan saat mengexport data logbook'], 500);
         }
     }
 
@@ -296,9 +295,10 @@ class ReportController extends Controller
                 'data' => $data
             ]);
         } catch (\Exception $e) {
+            Log::error('Logbook JSON error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => 'Terjadi kesalahan saat mengambil data logbook',
                 'data' => []
             ], 500);
         }
@@ -320,11 +320,15 @@ class ReportController extends Controller
 
         $students = $query->with(['company', 'class'])->get();
 
+        // Batch query semua logbook untuk mengurangi N+1
+        $allLogbooks = Logbook::whereIn('user_id', $students->pluck('id'))
+            ->whereBetween('date', [$start_date, $end_date])
+            ->get()
+            ->groupBy('user_id');
+
         $data = [];
         foreach ($students as $student) {
-            $logbooks = Logbook::where('user_id', $student->id)
-                ->whereBetween('date', [$start_date, $end_date])
-                ->get();
+            $logbooks = $allLogbooks->get($student->id, collect());
 
             $totalLogbook = $logbooks->count();
             $avgGrade = $logbooks->avg('grade');
@@ -402,7 +406,7 @@ class ReportController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Grade export error: ' . $e->getMessage());
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Terjadi kesalahan saat mengexport data nilai'], 500);
         }
     }
 
@@ -418,9 +422,10 @@ class ReportController extends Controller
                 'data' => $data
             ]);
         } catch (\Exception $e) {
+            Log::error('Grade JSON error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => 'Terjadi kesalahan saat mengambil data nilai',
                 'data' => []
             ], 500);
         }
@@ -433,12 +438,12 @@ class ReportController extends Controller
     {
         $students = User::where('role_id', 2)
             ->with(['company', 'class'])
+            ->withAvg('logbooks as avg_grade', 'grade')
             ->get();
 
         $data = [];
         foreach ($students as $student) {
-            $avgGrade = Logbook::where('user_id', $student->id)->avg('grade');
-            $finalGrade = $avgGrade ? round($avgGrade, 2) : 0;
+            $finalGrade = $student->avg_grade ? round((float) $student->avg_grade, 2) : 0;
 
             $gradeLetter = '';
             $gradeDescription = '';
@@ -532,7 +537,7 @@ class ReportController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Summary export error: ' . $e->getMessage());
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Terjadi kesalahan saat mengexport rekap data'], 500);
         }
     }
 
@@ -548,9 +553,10 @@ class ReportController extends Controller
                 'data' => $data
             ]);
         } catch (\Exception $e) {
+            Log::error('Summary JSON error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => 'Terjadi kesalahan saat mengambil data rekap',
                 'data' => []
             ], 500);
         }
@@ -572,26 +578,30 @@ class ReportController extends Controller
 
         $students = $query->with(['company', 'class'])->get();
 
+        // Batch query attendance
+        $attendanceQuery = Attendance::whereIn('user_id', $students->pluck('id'));
+        if ($start_date && $end_date) {
+            $attendanceQuery->whereBetween('date', [$start_date, $end_date]);
+        }
+        $allAttendances = $attendanceQuery->get()->groupBy('user_id');
+
+        // Batch query logbook
+        $logbookQuery = Logbook::whereIn('user_id', $students->pluck('id'));
+        if ($start_date && $end_date) {
+            $logbookQuery->whereBetween('date', [$start_date, $end_date]);
+        }
+        $allLogbooks = $logbookQuery->get()->groupBy('user_id');
+
         $data = [];
         foreach ($students as $student) {
-            // Attendance query
-            $attendanceQuery = Attendance::where('user_id', $student->id);
-            if ($start_date && $end_date) {
-                $attendanceQuery->whereBetween('date', [$start_date, $end_date]);
-            }
-            $attendances = $attendanceQuery->get();
+            $attendances = $allAttendances->get($student->id, collect());
 
             $hadir = $attendances->where('status', 'present')->count();
             $izin = $attendances->where('status', 'permit')->count();
             $sakit = $attendances->where('status', 'sick')->count();
             $alpha = $attendances->where('status', 'absent')->count();
 
-            // Logbook query
-            $logbookQuery = Logbook::where('user_id', $student->id);
-            if ($start_date && $end_date) {
-                $logbookQuery->whereBetween('date', [$start_date, $end_date]);
-            }
-            $logbooks = $logbookQuery->get();
+            $logbooks = $allLogbooks->get($student->id, collect());
 
             $totalLogbook = $logbooks->count();
             $avgGrade = $logbooks->avg('grade');

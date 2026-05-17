@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/** @deprecated Use User model with role_id = 4 or Company model instead */
 class Perusahaan extends Model
 {
     protected $table = 'perusahaans';

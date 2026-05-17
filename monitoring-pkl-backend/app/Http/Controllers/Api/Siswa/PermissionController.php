@@ -49,7 +49,7 @@ class PermissionController extends Controller
         $attachmentPath = null;
         if ($request->hasFile('attachment')) {
             $file = $request->file('attachment');
-            $fileName = 'permission_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $fileName = 'permission_' . $user->id . '_' . time() . '.' . $file->guessExtension();
             $attachmentPath = $file->storeAs('permissions', $fileName, 'public');
         }
         
@@ -117,7 +117,7 @@ class PermissionController extends Controller
             }
             
             $file = $request->file('attachment');
-            $fileName = 'permission_' . auth()->id() . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $fileName = 'permission_' . auth()->id() . '_' . time() . '.' . $file->guessExtension();
             $attachmentPath = $file->storeAs('permissions', $fileName, 'public');
             $permission->attachment = $attachmentPath;
         }

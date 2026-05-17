@@ -305,7 +305,7 @@ const fetchDashboardStats = async () => {
 
 const fetchRecentLogbooks = async () => {
   try {
-    const res = await axios.get('/siswa/logbooks/recent')
+    const res = await axios.get('/siswa/dashboard/logbooks/recent')
     recentLogbooks.value = res.data
   } catch (error) {
     console.error('Failed to load recent logbooks:', error)

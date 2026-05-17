@@ -330,7 +330,7 @@ const loadAttendanceStats = async () => {
 // Load recent activities
 const loadRecentActivities = async () => {
   try {
-    const res = await axios.get('/admin/recent-activities')
+    const res = await axios.get('/admin/dashboard/recent-activities')
     recentActivities.value = res.data.map(activity => ({
       ...activity,
       icon: getActivityIcon(activity.type),
@@ -353,7 +353,7 @@ const loadRecentActivities = async () => {
 // Load top students
 const loadTopStudents = async () => {
   try {
-    const res = await axios.get('/admin/top-students')
+    const res = await axios.get('/admin/dashboard/top-students')
     topStudents.value = res.data
   } catch (error) {
     console.error('Failed to load top students:', error)

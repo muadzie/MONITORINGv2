@@ -14,26 +14,23 @@ class MonitoringController extends Controller
     public function index()
     {
         try {
-            // Ambil semua siswa dengan relasi
+            $today = Carbon::today();
+
             $students = User::where('role_id', 2)
                 ->with(['company', 'class'])
+                ->withCount(['logbooks'])
+                ->withAvg('logbooks as avg_grade', 'grade')
                 ->get();
-            
-            $result = [];
-            foreach ($students as $student) {
-                // Status kehadiran hari ini
-                $today = Carbon::today();
-                $attendance = Attendance::where('user_id', $student->id)
-                    ->whereDate('date', $today)
-                    ->first();
-                
-                // Hitung total logbook
-                $logbookCount = Logbook::where('user_id', $student->id)->count();
-                
-                // Hitung rata-rata nilai
-                $avgGrade = Logbook::where('user_id', $student->id)->avg('grade');
-                
-                $result[] = [
+
+            $todayAttendances = Attendance::whereIn('user_id', $students->pluck('id'))
+                ->whereDate('date', $today)
+                ->get()
+                ->keyBy('user_id');
+
+            $result = $students->map(function ($student) use ($todayAttendances) {
+                $attendance = $todayAttendances->get($student->id);
+
+                return [
                     'id' => $student->id,
                     'nisn' => $student->nisn,
                     'name' => $student->name,
@@ -42,15 +39,15 @@ class MonitoringController extends Controller
                     'company_id' => $student->company_id,
                     'company' => $student->company,
                     'today_status' => $attendance ? $attendance->status : 'absent',
-                    'logbook_count' => $logbookCount,
-                    'avg_grade' => $avgGrade ? round($avgGrade, 2) : 0,
+                    'logbook_count' => (int) $student->logbooks_count,
+                    'avg_grade' => $student->avg_grade ? round((float) $student->avg_grade, 2) : 0,
                 ];
-            }
-            
+            });
+
             return response()->json($result);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error: ' . $e->getMessage()
+                'message' => 'Terjadi kesalahan internal'
             ], 500);
         }
     }
@@ -59,39 +56,39 @@ class MonitoringController extends Controller
     {
         try {
             $query = User::where('role_id', 2)
-                ->with(['company', 'class']);
-            
+                ->with(['company', 'class'])
+                ->withCount(['logbooks'])
+                ->withAvg('logbooks as avg_grade', 'grade');
+
             if ($request->class_id) {
                 $query->where('class_id', $request->class_id);
             }
-            
+
             if ($request->company_id) {
                 $query->where('company_id', $request->company_id);
             }
-            
+
             $students = $query->get();
-            
-            $result = [];
-            foreach ($students as $student) {
-                $logbookCount = Logbook::where('user_id', $student->id)->count();
-                $progress = min(100, round(($logbookCount / 30) * 100));
-                $avgGrade = Logbook::where('user_id', $student->id)->avg('grade');
-                
-                $result[] = [
+
+            $result = $students->map(function ($student) {
+                $logbookCount = (int) $student->logbooks_count;
+                $avgGrade = $student->avg_grade;
+
+                return [
                     'id' => $student->id,
                     'nisn' => $student->nisn,
                     'name' => $student->name,
                     'class' => $student->class,
                     'company' => $student->company,
                     'logbook_count' => $logbookCount,
-                    'progress' => $progress,
-                    'avg_grade' => $avgGrade ? round($avgGrade, 2) : 0,
+                    'progress' => min(100, round(($logbookCount / 30) * 100)),
+                    'avg_grade' => $avgGrade ? round((float) $avgGrade, 2) : 0,
                 ];
-            }
-            
+            });
+
             return response()->json($result);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Terjadi kesalahan internal'], 500);
         }
     }
     
@@ -206,33 +203,28 @@ class MonitoringController extends Controller
         try {
             $student = User::where('role_id', 2)
                 ->with(['company', 'class'])
+                ->withCount(['logbooks'])
+                ->withAvg('logbooks as avg_grade', 'grade')
                 ->findOrFail($id);
-            
-            // Recent logbooks
+
             $recentLogbooks = Logbook::where('user_id', $student->id)
                 ->orderBy('date', 'desc')
                 ->limit(5)
                 ->get();
-            
-            // Logbook count
-            $logbookCount = Logbook::where('user_id', $student->id)->count();
-            
-            // Rata-rata nilai
-            $avgGrade = Logbook::where('user_id', $student->id)->avg('grade');
-            
+
             return response()->json([
                 'id' => $student->id,
                 'nisn' => $student->nisn,
                 'name' => $student->name,
                 'class' => $student->class,
                 'company' => $student->company,
-                'logbook_count' => $logbookCount,
-                'avg_grade' => $avgGrade ? round($avgGrade, 2) : 0,
+                'logbook_count' => (int) $student->logbooks_count,
+                'avg_grade' => $student->avg_grade ? round((float) $student->avg_grade, 2) : 0,
                 'recent_logbooks' => $recentLogbooks,
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error: ' . $e->getMessage()
+                'message' => 'Terjadi kesalahan internal'
             ], 500);
         }
     }

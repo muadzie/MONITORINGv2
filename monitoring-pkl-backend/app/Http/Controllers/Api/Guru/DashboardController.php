@@ -71,13 +71,14 @@ class DashboardController extends Controller
             ->get();
         
         // Hitung jumlah logbook per siswa
+        $students->loadCount('logbooks');
+
         $topStudents = $students->map(function($student) {
-            $logbookCount = Logbook::where('user_id', $student->id)->count();
             return [
                 'id' => $student->id,
                 'name' => $student->name,
                 'company_name' => $student->company->name ?? 'Belum ditempatkan',
-                'logbook_count' => $logbookCount,
+                'logbook_count' => $student->logbooks_count,
             ];
         })->sortByDesc('logbook_count')->take(5)->values();
         

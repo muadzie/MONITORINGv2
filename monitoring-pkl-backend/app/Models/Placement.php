@@ -11,7 +11,7 @@ class Placement extends Model
     protected $fillable = [
         'student_id',
         'company_id',
-        'teacher_id',     // ← TAMBAHKAN INI
+        'teacher_id',
         'start_date',
         'end_date',
         'status',
@@ -23,6 +23,21 @@ class Placement extends Model
         'end_date' => 'date',
     ];
     
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
+
+    public function scopeByCompany($query, $companyId)
+    {
+        return $query->where('company_id', $companyId);
+    }
+
+    public function scopeStudentIdsByCompany($query, $companyId)
+    {
+        return $query->where('company_id', $companyId)->where('status', 'active')->pluck('student_id');
+    }
+
     public function student()
     {
         return $this->belongsTo(User::class, 'student_id');
@@ -33,7 +48,6 @@ class Placement extends Model
         return $this->belongsTo(Company::class);
     }
     
-    // ← TAMBAHKAN RELASI INI
     public function teacher()
     {
         return $this->belongsTo(User::class, 'teacher_id');

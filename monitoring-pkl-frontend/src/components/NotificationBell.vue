@@ -93,8 +93,9 @@ const formatTime = (date) => {
 const fetchNotifications = async () => {
   try {
     const res = await axios.get('/notifications')
-    notifications.value = res.data.notifications
-    unreadCount.value = res.data.unread_count
+    const paginated = res.data.data || {}
+    notifications.value = paginated.data || []
+    unreadCount.value = paginated.total || 0
   } catch (error) {
     console.error('Failed to fetch notifications:', error)
   }

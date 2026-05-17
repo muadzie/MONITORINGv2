@@ -14,17 +14,18 @@ class Attendance extends Model
 
     protected $casts = [
         'date' => 'date',
-        'check_in' => 'datetime',
-        'check_out' => 'datetime',
+        'check_in' => 'datetime:H:i',
+        'check_out' => 'datetime:H:i',
     ];
-      public function student()
+
+    public function student()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-     public function placement()
+    public function placement()
     {
-        return $this->belongsTo(Placement::class, 'company_id');
+        return $this->belongsTo(Placement::class, 'student_id', 'user_id');
     }
     public function user()
     {

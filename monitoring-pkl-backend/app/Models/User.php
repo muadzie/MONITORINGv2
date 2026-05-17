@@ -3,6 +3,7 @@
 
 namespace App\Models;
 
+use App\Constants\RoleConstants;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -23,10 +24,19 @@ class User extends Authenticatable
         'mata_pelajaran',
         'bidang_usaha',
         'kontak_person',
-        'phone', 
+        'phone',
+        'address',
         'role_id', 
-        'company_id', 
-        'teacher_id'
+        'company_id',
+        'class_id', 
+        'teacher_id',
+        'registration_status',
+        'is_active',
+        'rejection_reason',
+        'approved_by',
+        'approved_at',
+        'photo',
+        'nomor_induk',
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -55,12 +65,6 @@ class User extends Authenticatable
         return $this->hasMany(User::class, 'teacher_id');
     }
 
-    // PERBAIKI: students() untuk menghitung jumlah siswa bimbingan (hanya untuk guru)
-    public function students()
-    {
-        return $this->hasMany(User::class, 'teacher_id');
-    }
-
     // Relasi Absensi
     public function attendances()
     {
@@ -82,17 +86,34 @@ class User extends Authenticatable
     // Scopes
     public function scopeStudents($query)
     {
-        return $query->where('role_id', 2);
+        return $query->where('role_id', RoleConstants::SISWA);
     }
 
     public function scopeTeachers($query)
     {
-        return $query->where('role_id', 3);
+        return $query->where('role_id', RoleConstants::GURU);
     }
 
     public function scopeCompanies($query)
     {
-        return $query->where('role_id', 4);
+        return $query->where('role_id', RoleConstants::PERUSAHAAN);
+    }
+
+    public function scopeSupervisedBy($query, $teacherId)
+    {
+        return $query->where('role_id', RoleConstants::SISWA)->where('teacher_id', $teacherId);
+    }
+
+    public function scopeByCompany($query, $companyId)
+    {
+        return $query->where('role_id', RoleConstants::SISWA)->where('company_id', $companyId);
+    }
+
+    public function scopeActivePlacement($query)
+    {
+        return $query->whereHas('placements', function ($q) {
+            $q->where('status', 'active');
+        });
     }
 
     // Relasi Assessment

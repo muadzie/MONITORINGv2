@@ -7,63 +7,29 @@ use App\Models\User;
 use App\Models\Attendance;
 use App\Models\Logbook;
 use App\Models\Placement;
-use App\Models\Assessment;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class MonitoringController extends Controller
 {
-    // Ambil semua siswa yang dibimbing oleh guru ini
-  public function students()
+    public function students()
     {
         $user = auth()->user();
-        
-        // Debug - cek user yang login
-        \Log::info('=== GURU STUDENTS API ===');
-        \Log::info('User ID: ' . $user->id);
-        \Log::info('User Name: ' . $user->name);
-        \Log::info('User Role: ' . $user->role_id);
-        
-        // Method 1: Langsung query ke database
-        $students = DB::table('users')
-            ->where('role_id', 2)
-            ->where('teacher_id', $user->id)
-            ->get();
-        
-        \Log::info('Query 1 result (raw DB): ' . $students->count());
-        
-        // Method 2: Menggunakan Eloquent
-        $studentsEloquent = User::where('role_id', 2)
-            ->where('teacher_id', $user->id)
+
+        $students = User::supervisedBy($user->id)
             ->with(['class', 'company'])
             ->get();
-        
-        \Log::info('Query 2 result (Eloquent): ' . $studentsEloquent->count());
-        
-        // Jika masih kosong, cek melalui tabel placements
-        if ($studentsEloquent->isEmpty()) {
-            \Log::info('Trying via placements table...');
+
+        if ($students->isEmpty()) {
             $studentIds = Placement::where('teacher_id', $user->id)
                 ->where('status', 'active')
                 ->pluck('student_id');
-            
-            \Log::info('Student IDs from placements: ' . json_encode($studentIds));
-            
-            $studentsEloquent = User::whereIn('id', $studentIds)
+
+            $students = User::whereIn('id', $studentIds)
                 ->with(['class', 'company'])
                 ->get();
-            
-            \Log::info('Students from placements: ' . $studentsEloquent->count());
         }
-        
-        // Format response
-        $result = $studentsEloquent->map(function($student) {
-            $logbookCount = Logbook::where('user_id', $student->id)->count();
-            
-            $totalAttendance = Attendance::where('user_id', $student->id)->count();
-            $presentCount = Attendance::where('user_id', $student->id)->where('status', 'present')->count();
-            $attendancePercentage = $totalAttendance > 0 ? round(($presentCount / $totalAttendance) * 100) : 0;
-            
+
+        $result = $students->map(function ($student) {
             return [
                 'id' => $student->id,
                 'nisn' => $student->nisn,
@@ -72,42 +38,37 @@ class MonitoringController extends Controller
                 'phone' => $student->phone,
                 'class' => $student->class,
                 'company' => $student->company,
-                'logbook_count' => $logbookCount,
-                'attendance_percentage' => $attendancePercentage,
+                'logbook_count' => $student->logbooks_count ?? $student->logbooks()->count(),
+                'attendance_percentage' => $this->getAttendancePercentage($student->id),
                 'assessment' => null,
             ];
         });
-        
+
         return response()->json([
             'success' => true,
             'data' => $result,
-            'debug' => [
-                'user_id' => $user->id,
-                'teacher_id_used' => $user->id,
-                'count' => $result->count()
-            ]
         ]);
     }
     
-    // Monitoring siswa (untuk halaman monitoring)
     public function index()
     {
         $user = auth()->user();
-        
-        $students = User::where('role_id', 2)
-            ->where('teacher_id', $user->id)
+
+        $students = User::supervisedBy($user->id)
             ->with(['class', 'company'])
+            ->withCount(['logbooks'])
             ->get();
-        
+
         $today = now()->format('Y-m-d');
-        
-        $result = $students->map(function($student) use ($today) {
-            $attendance = Attendance::where('user_id', $student->id)
-                ->whereDate('date', $today)
-                ->first();
-            
-            $logbookCount = Logbook::where('user_id', $student->id)->count();
-            
+
+        $todayAttendances = Attendance::whereIn('user_id', $students->pluck('id'))
+            ->whereDate('date', $today)
+            ->get()
+            ->keyBy('user_id');
+
+        $result = $students->map(function ($student) use ($todayAttendances) {
+            $attendance = $todayAttendances->get($student->id);
+
             return [
                 'id' => $student->id,
                 'nisn' => $student->nisn,
@@ -117,10 +78,10 @@ class MonitoringController extends Controller
                 'today_status' => $attendance ? $attendance->status : 'absent',
                 'today_check_in' => $attendance ? $attendance->check_in : null,
                 'today_check_out' => $attendance ? $attendance->check_out : null,
-                'logbook_count' => $logbookCount,
+                'logbook_count' => (int) $student->logbooks_count,
             ];
         });
-        
+
         return response()->json([
             'success' => true,
             'data' => $result

@@ -336,7 +336,7 @@ const getTopStudentColor = (index) => {
 // Fetch chart data
 const fetchChartData = async () => {
   try {
-    const res = await axios.get(`/guru/attendance/chart?period=${chartPeriod.value}`)
+    const res = await axios.get(`/guru/dashboard/attendance/chart?period=${chartPeriod.value}`)
     attendanceChartData.value = res.data || []
     updateChart()
   } catch (error) {
@@ -406,7 +406,7 @@ const fetchPendingPermissions = async () => {
 
 const fetchTopStudents = async () => {
   try {
-    const res = await axios.get('/guru/top-students')
+    const res = await axios.get('/guru/dashboard/top-students')
     topStudents.value = res.data.data || res.data || []
   } catch (error) {
     console.error('Failed to fetch top students:', error)

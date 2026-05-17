@@ -399,25 +399,11 @@ const formatTime = (date) => {
 const fetchNotifications = async () => {
   try {
     const res = await axios.get('/notifications')
-    console.log('Notifications response:', res.data)
     
-    // Pastikan mengambil array yang benar
-    let data = []
-    if (res.data && res.data.data && Array.isArray(res.data.data)) {
-      data = res.data.data
-    } else if (res.data && Array.isArray(res.data)) {
-      data = res.data
-    } else {
-      data = []
-    }
-     notifications.value = data
-    // Hitung unread count dengan aman
-    if (Array.isArray(data)) {
-      unreadCount.value = data.filter(n => !n.is_read).length
-    } else {
-      unreadCount.value = 0
-    }
-    console.log('Notifications loaded:', notifications.value.length, 'Unread:', unreadCount.value)
+    const paginated = res.data.data || {}
+    const data = paginated.data || []
+    notifications.value = data
+    unreadCount.value = data.filter(n => !n.is_read).length
   } catch (error) {
     console.error('Failed to fetch notifications:', error)
     notifications.value = []

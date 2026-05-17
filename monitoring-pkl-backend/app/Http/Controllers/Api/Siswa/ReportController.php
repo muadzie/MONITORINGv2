@@ -26,11 +26,6 @@ class ReportController extends Controller
     public function upload(Request $request)
     {
         try {
-            // Debug: log semua request
-            \Log::info('===== UPLOAD REQUEST =====');
-            \Log::info('All files:', $request->allFiles());
-            \Log::info('Has file report: ' . $request->hasFile('report'));
-            
             // Validasi dengan pesan custom
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
                 'report' => 'required|file|mimes:pdf,doc,docx|max:10240'
@@ -42,7 +37,6 @@ class ReportController extends Controller
             ]);
             
             if ($validator->fails()) {
-                \Log::error('Validation fails: ' . json_encode($validator->errors()));
                 return response()->json([
                     'success' => false,
                     'message' => 'Validasi gagal',
@@ -53,13 +47,6 @@ class ReportController extends Controller
             $user = $request->user();
             $file = $request->file('report');
             
-            \Log::info('File info:', [
-                'name' => $file->getClientOriginalName(),
-                'size' => $file->getSize(),
-                'mime' => $file->getMimeType(),
-                'extension' => $file->getClientOriginalExtension()
-            ]);
-            
             // Hapus laporan lama
             $oldReport = Report::where('user_id', $user->id)->first();
             if ($oldReport) {
@@ -69,7 +56,7 @@ class ReportController extends Controller
                 $oldReport->delete();
             }
 
-            $fileName = 'report_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $fileName = 'report_' . $user->id . '_' . time() . '.' . $file->guessExtension();
             $filePath = $file->storeAs('reports', $fileName, 'public');
             
             $report = Report::create([
@@ -81,8 +68,6 @@ class ReportController extends Controller
             ]);
 
             $report->file_url = asset('storage/' . $filePath);
-
-            \Log::info('Upload success: ' . $report->id);
             
             return response()->json([
                 'success' => true,
@@ -92,10 +77,9 @@ class ReportController extends Controller
             
         } catch (\Exception $e) {
             \Log::error('Upload error: ' . $e->getMessage());
-            \Log::error('Trace: ' . $e->getTraceAsString());
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                'message' => 'Terjadi kesalahan saat mengupload laporan'
             ], 500);
         }
     }

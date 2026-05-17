@@ -65,7 +65,7 @@ class AttendanceController extends Controller
         $user = auth()->user();
         
         $students = User::where('teacher_id', $user->id)
-            ->where('role_id', 3) // role siswa
+            ->where('role_id', 2) // role siswa
             ->select('id', 'name', 'nisn', 'class_id')
             ->with('class:id,name')
             ->get();

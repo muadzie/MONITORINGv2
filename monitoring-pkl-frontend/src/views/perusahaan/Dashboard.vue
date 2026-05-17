@@ -250,7 +250,7 @@ const fetchDashboardStats = async () => {
 
 const fetchTopStudents = async () => {
   try {
-    const res = await axios.get('/perusahaan/top-students')
+    const res = await axios.get('/perusahaan/dashboard/top-students')
     console.log('Top students:', res.data)
     topStudents.value = res.data.data || res.data || []
   } catch (error) {

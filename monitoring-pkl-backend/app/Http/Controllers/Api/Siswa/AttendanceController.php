@@ -226,16 +226,54 @@ class AttendanceController extends Controller
         ]);
     }
 
+    public function monthly(Request $request)
+    {
+        $user = $request->user();
+        $month = $request->get('month', now()->month);
+        $year = $request->get('year', now()->year);
+        
+        $attendances = Attendance::where('user_id', $user->id)
+            ->whereYear('date', $year)
+            ->whereMonth('date', $month)
+            ->orderBy('date', 'asc')
+            ->get();
+        
+        return response()->json([
+            'success' => true,
+            'data' => $attendances
+        ]);
+    }
+    
+    public function uploadPhoto(Request $request)
+    {
+        $request->validate([
+            'photo' => 'required|image|mimes:jpg,jpeg,png|max:5120',
+        ]);
+
+        $user = $request->user();
+        $path = $request->file('photo')->store('attendance-photos', 'public');
+
+        // Simpan photo ke attendance hari ini jika sudah check-in
+        $today = now()->format('Y-m-d');
+        $attendance = Attendance::where('user_id', $user->id)
+            ->whereDate('date', $today)
+            ->first();
+
+        if ($attendance) {
+            $attendance->photo = $path;
+            $attendance->save();
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Foto berhasil diupload',
+            'photo_url' => asset('storage/' . $path),
+        ]);
+    }
+    
     private function calculateDistance($lat1, $lon1, $lat2, $lon2)
     {
-        $earthRadius = 6371000;
-        $latDelta = deg2rad($lat2 - $lat1);
-        $lonDelta = deg2rad($lon2 - $lon1);
-        $a = sin($latDelta / 2) * sin($latDelta / 2) +
-             cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
-             sin($lonDelta / 2) * sin($lonDelta / 2);
-        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
-        return $earthRadius * $c;
+        return haversineDistance($lat1, $lon1, $lat2, $lon2);
     }
 
     private function fillPreviousAbsences($userId, $currentDate)

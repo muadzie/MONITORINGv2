@@ -65,7 +65,7 @@ class LogbookController extends Controller
         $attachmentPath = null;
         if ($request->hasFile('attachment')) {
             $file = $request->file('attachment');
-            $fileName = 'logbook_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $fileName = 'logbook_' . $user->id . '_' . time() . '.' . $file->guessExtension();
             $attachmentPath = $file->storeAs('logbooks', $fileName, 'public');
         }
         
@@ -137,7 +137,7 @@ class LogbookController extends Controller
             }
             
             $file = $request->file('attachment');
-            $fileName = 'logbook_' . auth()->id() . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $fileName = 'logbook_' . auth()->id() . '_' . time() . '.' . $file->guessExtension();
             $attachmentPath = $file->storeAs('logbooks', $fileName, 'public');
             $logbook->attachment = $attachmentPath;
         }

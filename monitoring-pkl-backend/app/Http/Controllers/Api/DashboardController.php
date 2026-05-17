@@ -27,7 +27,6 @@ class DashboardController extends Controller
                 'present_today' => Attendance::whereDate('date', Carbon::today())->where('status', 'present')->count(),
                 'total_logbooks' => Logbook::count(),
                 'present_percentage' => $this->getAttendancePercentage(),
-                'total_logbooks' => Logbook::count(),
                 'total_permissions' => \App\Models\Permission::count(),
                 'average_grade' => round(Logbook::avg('grade') ?? 0, 2),
             ];
@@ -39,7 +38,6 @@ class DashboardController extends Controller
                 'present_today' => Attendance::whereIn('user_id', $studentIds)->whereDate('date', Carbon::today())->where('status', 'present')->count(),
                 'total_logbooks' => Logbook::whereIn('user_id', $studentIds)->count(),
                 'present_percentage' => $this->getAttendancePercentage($studentIds),
-                'total_logbooks' => Logbook::whereIn('user_id', $studentIds)->count(),
                 'total_permissions' => \App\Models\Permission::whereIn('user_id', $studentIds)->count(),
                 'average_grade' => round(Logbook::whereIn('user_id', $studentIds)->avg('grade') ?? 0, 2),
             ];

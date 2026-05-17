@@ -331,6 +331,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import axios from '../plugins/axios'
 import { 
   HomeIcon, 
   UserGroupIcon, 
@@ -388,7 +389,8 @@ const formatTime = (date) => {
 const fetchNotifications = async () => {
   try {
     const { data } = await axios.get('/notifications')
-    notifications.value = data.data || []
+    const paginated = data.data || {}
+    notifications.value = paginated.data || []
     unreadCount.value = notifications.value.filter(n => !n.is_read).length
   } catch (error) {
     console.error('Failed to fetch notifications:', error)
