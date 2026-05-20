@@ -143,25 +143,25 @@ Sistem menggunakan arsitektur **RESTful API + SPA** (Single Page Application) de
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                   CLIENT (Web Browser)                       │
+│                   CLIENT (Web Browser)                      │
 │  ┌───────────────────────────────────────────────────────┐  │
 │  │            Vue 3 Single Page Application              │  │
-│  │  ┌──────────────┐  ┌──────────┐  ┌────────────────┐ │  │
-│  │  │  Pinia Store  │  │  Router  │  │  Axios Client  │ │  │
-│  │  └──────────────┘  └──────────┘  └────────────────┘ │  │
+│  │  ┌──────────────┐  ┌──────────┐  ┌────────────────┐   │  │
+│  │  │  Pinia Store  │  │  Router  │  │  Axios Client │   │  │
+│  │  └──────────────┘  └──────────┘  └────────────────┘   │  │
 │  │  ┌──────────────────────────────────────────────────┐ │  │
 │  │  │  Layouts: Admin | Guru | Siswa | Perusahaan      │ │  │
 │  │  └──────────────────────────────────────────────────┘ │  │
 │  └───────────────────────────────────────────────────────┘  │
-│                          │  HTTPS / JSON                     │
+│                          │  HTTPS / JSON                    │
 └─────────────────────────────────────────────────────────────┘
                            │
 ┌─────────────────────────────────────────────────────────────┐
-│                 LARAVEL REST API (Backend)                    │
+│                 LARAVEL REST API (Backend)                  │
 │  ┌───────────────────────────────────────────────────────┐  │
 │  │  Routes → Middleware (auth:sanctum) → Controllers     │  │
 │  │  ┌──────────────────────────────────────────────────┐ │  │
-│  │  │  Controllers: Auth | Admin | Guru | Siswa | Perusahaan │  │
+│  │  │Controllers: Auth |Admin |Guru |Siswa |Perusahaan │ │  │
 │  │  └──────────────────────────────────────────────────┘ │  │
 │  │  ┌──────────────────────────────────────────────────┐ │  │
 │  │  │  Models (Eloquent ORM) → Database (MySQL)        │ │  │
@@ -176,7 +176,7 @@ Sistem menggunakan arsitektur **RESTful API + SPA** (Single Page Application) de
 Siswa                    Browser                       Laravel API
   |                        |                              |
   |── Klik Check-in ──────>|                              |
-  |                        |── POST /check-in (lat,lng) ──>|
+  |                        |── POST /check-in (lat,lng)──>|
   |                        |                              |── Ambil data perusahaan
   |                        |                              |── Hitung jarak (Haversine)
   |                        |                              |── Validasi dalam radius?
