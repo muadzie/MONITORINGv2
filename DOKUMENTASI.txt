@@ -82,7 +82,7 @@
 
    Backend:
    - PHP 8.3
-   - Laravel 11
+   - Laravel 13
    - MySQL 8.x
    - Laravel Sanctum (Autentikasi API)
    - Maatwebsite/Laravel-Excel (Ekspor Excel)

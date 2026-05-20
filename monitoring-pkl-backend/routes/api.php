@@ -62,6 +62,7 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
     Route::prefix('registrations')->group(function () {
         Route::get('/', [App\Http\Controllers\Api\Admin\RegistrationController::class, 'index']);
         Route::get('/history', [App\Http\Controllers\Api\Admin\RegistrationController::class, 'history']);
+        Route::delete('/history', [App\Http\Controllers\Api\Admin\RegistrationController::class, 'clearHistory']);
         Route::post('/{id}/approve', [App\Http\Controllers\Api\Admin\RegistrationController::class, 'approve']);
         Route::post('/{id}/reject', [App\Http\Controllers\Api\Admin\RegistrationController::class, 'reject']);
     });
@@ -275,8 +276,9 @@ Route::prefix('notifications')->middleware('auth:sanctum')->group(function () {
     Route::get('/unread', [NotificationController::class, 'unread']);
     Route::put('/{id}/read', [NotificationController::class, 'markAsRead']);
     Route::put('/read-all', [NotificationController::class, 'markAllAsRead']);
-    Route::delete('/{id}', [NotificationController::class, 'destroy']);
+    Route::delete('/read', [NotificationController::class, 'deleteRead']);
     Route::delete('/clear', [NotificationController::class, 'clearAll']);
+    Route::delete('/{id}', [NotificationController::class, 'destroy']);
 });
 
 // ================================================================

@@ -1,4 +1,5 @@
 <template>
+  <LoadingScreen :visible="loading" text="Memproses login..." />
   <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 to-purple-700 py-12 px-4">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
       <!-- Header -->
@@ -110,6 +111,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
+import LoadingScreen from '../../components/LoadingScreen.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()

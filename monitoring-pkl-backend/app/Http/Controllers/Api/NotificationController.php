@@ -86,4 +86,16 @@ class NotificationController extends Controller
             'message' => 'Semua notifikasi dihapus'
         ]);
     }
+
+    public function deleteRead(Request $request)
+    {
+        Notification::where('user_id', $request->user()->id)
+            ->where('is_read', true)
+            ->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Riwayat notifikasi dihapus'
+        ]);
+    }
 }

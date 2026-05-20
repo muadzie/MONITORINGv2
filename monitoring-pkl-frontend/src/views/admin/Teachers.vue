@@ -247,8 +247,10 @@
 import { ref, computed, onMounted } from 'vue'
 import axios from '../../plugins/axios'
 import { useToast } from 'vue-toastification'
+import { useConfirm } from '../../composables/useConfirm'
 
 const toast = useToast()
+const { confirm } = useConfirm()
 const teachers = ref([])
 const loading = ref(false)
 const saving = ref(false)
@@ -362,14 +364,14 @@ const submitTeacher = async () => {
 }
 
 const deleteTeacher = async (teacher) => {
-  if (confirm(`Hapus guru "${teacher.name}"?`)) {
-    try {
-      await axios.delete(`/admin/teachers/${teacher.id}`)
-      toast.success('Guru berhasil dihapus')
-      await load()
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Gagal menghapus guru')
-    }
+  const ok = await confirm({ title: 'Hapus Guru', message: `Hapus guru "${teacher.name}"?` })
+  if (!ok) return
+  try {
+    await axios.delete(`/admin/teachers/${teacher.id}`)
+    toast.success('Guru berhasil dihapus')
+    await load()
+  } catch (error) {
+    toast.error(error.response?.data?.message || 'Gagal menghapus guru')
   }
 }
 

@@ -188,8 +188,10 @@ import { ref, computed, onMounted } from 'vue'
 import axios from '../../plugins/axios'
 import { useToast } from 'vue-toastification'
 import { PlusIcon, XMarkIcon } from '@heroicons/vue/24/outline'
+import { useConfirm } from '../../composables/useConfirm'
 
 const toast = useToast()
+const { confirm } = useConfirm()
 const classes = ref([])
 const teachers = ref([])
 const loading = ref(false)
@@ -296,15 +298,15 @@ const saveClass = async () => {
 }
 
 const deleteClass = async (cls) => {
-  if (confirm(`Hapus kelas ${cls.name}?`)) {
-    try {
-      await axios.delete(`/admin/classes/${cls.id}`)
-      toast.success('Kelas berhasil dihapus')
-      fetchClasses()
-    } catch (error) {
-      console.error('Delete class error:', error)
-      toast.error('Gagal menghapus kelas')
-    }
+  const ok = await confirm({ title: 'Hapus Kelas', message: `Hapus kelas ${cls.name}?` })
+  if (!ok) return
+  try {
+    await axios.delete(`/admin/classes/${cls.id}`)
+    toast.success('Kelas berhasil dihapus')
+    fetchClasses()
+  } catch (error) {
+    console.error('Delete class error:', error)
+    toast.error('Gagal menghapus kelas')
   }
 }
 

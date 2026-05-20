@@ -248,8 +248,10 @@
 import { ref, computed, onMounted } from 'vue'
 import axios from '../../plugins/axios'
 import { useToast } from 'vue-toastification'
+import { useConfirm } from '../../composables/useConfirm'
 
 const toast = useToast()
+const { confirm } = useConfirm()
 
 // State
 const permissions = ref([])
@@ -415,7 +417,8 @@ const deletePermission = async (item) => {
     return
   }
   
-  if (!confirm(`Hapus pengajuan ${item.type === 'sick' ? 'sakit' : 'izin'} tanggal ${formatDate(item.date)}?`)) return
+  const ok = await confirm({ title: 'Hapus Pengajuan', message: `Hapus pengajuan ${item.type === 'sick' ? 'sakit' : 'izin'} tanggal ${formatDate(item.date)}?` })
+  if (!ok) return
   
   try {
     await axios.delete(`/siswa/permissions/${item.id}`)

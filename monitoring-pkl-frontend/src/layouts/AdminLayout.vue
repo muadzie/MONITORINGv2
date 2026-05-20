@@ -58,6 +58,22 @@
           <span v-if="!sidebarCollapsed" class="text-sm font-medium">Dashboard</span>
         </router-link>
 
+        <!-- Verifikasi Pendaftaran -->
+        <router-link 
+          to="/admin/registrations"
+          class="flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 mb-1 group"
+          :class="[
+            $route.path.startsWith('/admin/registrations')
+              ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md' 
+              : 'text-gray-600 hover:bg-gray-100',
+            sidebarCollapsed ? 'justify-center' : ''
+          ]"
+          :title="sidebarCollapsed ? 'Verifikasi Pendaftaran' : ''"
+        >
+          <UserPlusIcon class="w-5 h-5 flex-shrink-0" />
+          <span v-if="!sidebarCollapsed" class="text-sm font-medium">Verifikasi Pendaftaran</span>
+        </router-link>
+
         <!-- Manajemen User (Dropdown - Default Open) -->
         <div class="mb-1">
           <button 
@@ -246,6 +262,22 @@
           </transition>
         </div>
 
+        <!-- Notifikasi -->
+        <router-link 
+          to="/admin/notifications"
+          class="flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 mb-1 group"
+          :class="[
+            $route.path.startsWith('/admin/notifications')
+              ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md' 
+              : 'text-gray-600 hover:bg-gray-100',
+            sidebarCollapsed ? 'justify-center' : ''
+          ]"
+          :title="sidebarCollapsed ? 'Notifikasi' : ''"
+        >
+          <BellIcon class="w-5 h-5 flex-shrink-0" />
+          <span v-if="!sidebarCollapsed" class="text-sm font-medium">Notifikasi</span>
+        </router-link>
+
         <!-- Pengaturan (Dropdown) -->
         <div class="mb-1">
           <button 
@@ -416,10 +448,12 @@ import {
   Cog6ToothIcon, 
   MagnifyingGlassIcon,
   UserIcon, 
+  UserPlusIcon,
   ArrowRightOnRectangleIcon, 
   ChevronDownIcon,
   BookOpenIcon,
-  StarIcon
+  StarIcon,
+  BellIcon
 } from '@heroicons/vue/24/outline'
 
 const router = useRouter()
@@ -451,6 +485,7 @@ const pageTitle = computed(() => {
   const path = route.path
   const titles = {
     '/admin/dashboard': 'Dashboard',
+    '/admin/registrations': 'Verifikasi Pendaftaran',
     '/admin/users': 'Manajemen User',
     '/admin/roles': 'Manajemen Role',
     '/admin/students': 'Manajemen Siswa',
@@ -463,6 +498,7 @@ const pageTitle = computed(() => {
     '/admin/monitoring/logbook': 'Monitoring Logbook',
     '/admin/monitoring/progress': 'Progress Siswa',
     '/admin/assessments': 'Penilaian PKL',
+    '/admin/notifications': 'Notifikasi',
     '/admin/settings/general': 'Pengaturan Umum',
     '/admin/settings/radius': 'Pengaturan Radius',
     '/admin/profile': 'Profile'
@@ -473,11 +509,13 @@ const pageTitle = computed(() => {
 const pageDescription = computed(() => {
   const desc = {
     '/admin/dashboard': 'Ringkasan data dan statistik PKL',
+    '/admin/registrations': 'Setujui atau tolak pendaftaran pengguna baru',
     '/admin/users': 'Kelola semua pengguna sistem',
     '/admin/students': 'Kelola data siswa peserta PKL',
     '/admin/teachers': 'Kelola data guru pembimbing',
     '/admin/companies': 'Kelola data perusahaan mitra',
-    '/admin/placements': 'Kelola penempatan PKL siswa'
+    '/admin/placements': 'Kelola penempatan PKL siswa',
+    '/admin/notifications': 'Semua notifikasi sistem'
   }
   return desc[route.path] || ''
 })

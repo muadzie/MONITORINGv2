@@ -36,7 +36,6 @@ class RegisterController extends Controller
             'password' => Hash::make($request->password),
             'nisn' => $request->nisn,
             'phone' => $request->phone,
-            'address' => $request->address,
             'role_id' => 2, // role siswa
             'registration_status' => 'pending',
             'is_active' => false

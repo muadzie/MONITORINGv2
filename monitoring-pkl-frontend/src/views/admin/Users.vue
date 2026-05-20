@@ -286,8 +286,10 @@
 import { ref, computed, onMounted } from 'vue'
 import axios from '../../plugins/axios'
 import { useToast } from 'vue-toastification'
+import { useConfirm } from '../../composables/useConfirm'
 
 const toast = useToast()
+const { confirm } = useConfirm()
 
 // State
 const users = ref([])
@@ -467,14 +469,14 @@ const saveUser = async () => {
 }
 
 const deleteUser = async (user) => {
-  if (confirm(`Hapus user "${user.name}"?`)) {
-    try {
-      await axios.delete(`/admin/users/${user.id}`)
-      toast.success('User berhasil dihapus')
-      await fetchUsers()
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Gagal menghapus')
-    }
+  const ok = await confirm({ title: 'Hapus User', message: `Hapus user "${user.name}"?` })
+  if (!ok) return
+  try {
+    await axios.delete(`/admin/users/${user.id}`)
+    toast.success('User berhasil dihapus')
+    await fetchUsers()
+  } catch (err) {
+    toast.error(err.response?.data?.message || 'Gagal menghapus')
   }
 }
 

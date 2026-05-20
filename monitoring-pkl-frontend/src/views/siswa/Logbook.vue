@@ -234,8 +234,10 @@
 import { ref, computed, onMounted } from 'vue'
 import axios from '../../plugins/axios'
 import { useToast } from 'vue-toastification'
+import { useConfirm } from '../../composables/useConfirm'
 
 const toast = useToast()
+const { confirm } = useConfirm()
 
 // State
 const logbooks = ref([])
@@ -412,7 +414,8 @@ const submitLogbook = async () => {
 
 // Delete logbook
 const deleteLogbook = async (logbook) => {
-  if (!confirm(`Hapus logbook tanggal ${formatDate(logbook.date)}?`)) return
+  const ok = await confirm({ title: 'Hapus Logbook', message: `Hapus logbook tanggal ${formatDate(logbook.date)}?` })
+  if (!ok) return
   
   try {
     await axios.delete(`/siswa/logbooks/${logbook.id}`)

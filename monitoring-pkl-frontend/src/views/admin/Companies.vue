@@ -204,6 +204,7 @@ import axios from '../../plugins/axios'
 import { useToast } from 'vue-toastification'
 import { PlusIcon, PencilSquareIcon, TrashIcon, MapPinIcon, XMarkIcon, BuildingOffice2Icon } from '@heroicons/vue/24/outline'
 import L from 'leaflet'
+import { useConfirm } from '../../composables/useConfirm'
 
 // Fix Leaflet icon
 delete L.Icon.Default.prototype._getIconUrl
@@ -214,6 +215,7 @@ L.Icon.Default.mergeOptions({
 })
 
 const toast = useToast()
+const { confirm } = useConfirm()
 const companies = ref([])
 const loading = ref(true)
 const showModal = ref(false)
@@ -493,7 +495,8 @@ const saveCompany = async () => {
 }
 
 const deleteCompany = async (company) => {
-  if (!confirm(`Hapus perusahaan "${company.name}"?`)) return
+  const ok = await confirm({ title: 'Hapus Perusahaan', message: `Hapus perusahaan "${company.name}"?` })
+  if (!ok) return
   
   try {
     // DELETE - pakai /admin/companies/{id}

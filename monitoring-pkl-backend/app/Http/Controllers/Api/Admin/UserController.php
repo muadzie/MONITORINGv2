@@ -20,6 +20,10 @@ class UserController extends Controller
             // Gunakan pagination untuk mengurangi beban
             $users = User::select('id', 'name', 'email', 'role_id', 'created_at')
                 ->with('role:id,name')
+                ->where(function ($q) {
+                    $q->whereNull('registration_status')
+                      ->orWhere('registration_status', '!=', 'rejected');
+                })
                 ->orderBy('created_at', 'desc')
                 ->paginate(20);
             

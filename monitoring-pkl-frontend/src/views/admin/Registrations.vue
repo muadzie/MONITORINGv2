@@ -60,6 +60,11 @@
 
     <!-- History Tab -->
     <div v-if="activeTab === 'history'" class="space-y-4">
+      <div v-if="registrationHistory.length > 0" class="flex justify-end">
+        <button @click="confirmClearHistory" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm">
+          Hapus Semua Riwayat
+        </button>
+      </div>
       <div v-for="reg in registrationHistory" :key="reg.id" class="bg-white rounded-2xl shadow-sm p-6">
         <div class="flex justify-between items-start">
           <div class="flex items-start gap-4">
@@ -101,8 +106,10 @@ import { ref, computed, onMounted } from 'vue'
 import axios from '../../plugins/axios'
 import { useToast } from 'vue-toastification'
 import { CheckCircleIcon } from '@heroicons/vue/24/outline'
+import { useConfirm } from '../../composables/useConfirm'
 
 const toast = useToast()
+const { confirm } = useConfirm()
 const activeTab = ref('pending')
 const pendingRegistrations = ref([])
 const registrationHistory = ref([])
@@ -196,6 +203,19 @@ const confirmReject = async () => {
     fetchHistory()
   } catch (error) {
     toast.error('Gagal menolak pendaftaran')
+  }
+}
+
+const confirmClearHistory = async () => {
+  const ok = await confirm({ title: 'Hapus Riwayat Pendaftaran', message: 'Yakin ingin menghapus semua riwayat pendaftaran? Data yang ditolak akan dihapus permanen.' })
+  if (!ok) return
+
+  try {
+    await axios.delete('/admin/registrations/history')
+    toast.success('Semua riwayat berhasil dihapus')
+    fetchHistory()
+  } catch (error) {
+    toast.error('Gagal menghapus riwayat')
   }
 }
 

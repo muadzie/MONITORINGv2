@@ -134,8 +134,10 @@ import { ref, onMounted } from 'vue'
 import axios from '../../plugins/axios'
 import { useToast } from 'vue-toastification'
 import { CloudArrowUpIcon, DocumentIcon, XMarkIcon, InformationCircleIcon } from '@heroicons/vue/24/outline'
+import { useConfirm } from '../../composables/useConfirm'
 
 const toast = useToast()
+const { confirm } = useConfirm()
 const fileInput = ref(null)
 const selectedFile = ref(null)
 const uploading = ref(false)
@@ -249,7 +251,8 @@ const uploadReport = async () => {
 }
 
 const deleteReport = async () => {
-  if (!confirm('Apakah Anda yakin ingin menghapus laporan ini?')) return
+  const ok = await confirm({ title: 'Hapus Laporan', message: 'Apakah Anda yakin ingin menghapus laporan ini?' })
+  if (!ok) return
   
   deleting.value = true
   try {

@@ -311,8 +311,10 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import axios from '../../plugins/axios'
 import { useToast } from 'vue-toastification'
+import { useConfirm } from '../../composables/useConfirm'
 
 const toast = useToast()
+const { confirm } = useConfirm()
 
 // State
 const placements = ref([])
@@ -591,7 +593,8 @@ const savePlacement = async () => {
 }
 
 const deletePlacement = async (placement) => {
-  if (!confirm(`Hapus penempatan siswa ${placement.student?.name} di ${placement.company?.name}?`)) return
+  const ok = await confirm({ title: 'Hapus Penempatan', message: `Hapus penempatan siswa ${placement.student?.name} di ${placement.company?.name}?` })
+  if (!ok) return
   
   try {
     await axios.delete(`/admin/placements/${placement.id}`)

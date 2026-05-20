@@ -23,6 +23,14 @@ class AuthController extends Controller
         return response()->json(['message' => 'Email atau password salah'], 401);
     }
 
+    if ($user->registration_status === 'rejected') {
+        return response()->json(['message' => 'Akun Anda telah ditolak. Silakan hubungi admin.'], 403);
+    }
+
+    if (!$user->is_active) {
+        return response()->json(['message' => 'Akun Anda belum diaktifkan. Silakan tunggu konfirmasi admin.'], 403);
+    }
+
     $token = $user->createToken('auth-token')->plainTextToken;
 
     return response()->json([

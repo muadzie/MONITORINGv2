@@ -5,13 +5,22 @@
         <h1 class="text-2xl font-bold text-gray-800">Notifikasi</h1>
         <p class="text-gray-500 mt-1">Semua notifikasi Anda</p>
       </div>
-      <button 
-        @click="markAllAsRead"
-        v-if="unreadCount > 0"
-        class="px-4 py-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition"
-      >
-        Tandai semua sudah dibaca
-      </button>
+      <div class="flex gap-2">
+        <button 
+          @click="markAllAsRead"
+          v-if="unreadCount > 0"
+          class="px-4 py-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition text-sm"
+        >
+          Tandai semua sudah dibaca
+        </button>
+        <button 
+          @click="deleteReadNotifications"
+          v-if="notifications.length - unreadCount > 0"
+          class="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition text-sm"
+        >
+          Hapus Riwayat
+        </button>
+      </div>
     </div>
 
     <!-- Stats -->
@@ -70,7 +79,7 @@
               <span class="text-xs px-2 py-1 rounded-full" :class="getTypeClass(notif.type)">
                 {{ notif.type === 'info' ? 'Informasi' : notif.type === 'success' ? 'Sukses' : notif.type === 'warning' ? 'Peringatan' : 'Error' }}
               </span>
-              <a v-if="notif.url" :href="notif.url" class="text-xs text-indigo-600 hover:underline">Lihat detail →</a>
+              <span v-if="notif.url" @click.stop="router.push(notif.url)" class="text-xs text-indigo-600 hover:underline cursor-pointer">Lihat detail →</span>
             </div>
           </div>
           <div v-if="!notif.is_read" class="w-2 h-2 bg-indigo-600 rounded-full mt-2"></div>
@@ -88,9 +97,14 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import axios from '../../plugins/axios'
 import { useToast } from 'vue-toastification'
+import { useConfirm } from '../../composables/useConfirm'
 import { BellIcon, CheckCircleIcon, ExclamationCircleIcon, InformationCircleIcon, XCircleIcon } from '@heroicons/vue/24/outline'
+
+const router = useRouter()
+const { confirm } = useConfirm()
 
 const toast = useToast()
 const notifications = ref([])
@@ -172,13 +186,13 @@ const markAsRead = async (notif) => {
       await axios.put(`/notifications/${notif.id}/read`)
       notif.is_read = true
       if (notif.url) {
-        window.location.href = notif.url
+        router.push(notif.url)
       }
     } catch (error) {
       console.error('Failed to mark as read:', error)
     }
   } else if (notif.url) {
-    window.location.href = notif.url
+    router.push(notif.url)
   }
 }
 
@@ -189,6 +203,18 @@ const markAllAsRead = async () => {
     toast.success('Semua notifikasi ditandai sudah dibaca')
   } catch (error) {
     toast.error('Gagal menandai notifikasi')
+  }
+}
+
+const deleteReadNotifications = async () => {
+  const ok = await confirm({ title: 'Hapus Riwayat', message: 'Hapus semua notifikasi yang sudah dibaca?' })
+  if (!ok) return
+  try {
+    await axios.delete('/notifications/read')
+    notifications.value = notifications.value.filter(n => !n.is_read)
+    toast.success('Riwayat notifikasi dihapus')
+  } catch (error) {
+    toast.error('Gagal menghapus riwayat')
   }
 }
 

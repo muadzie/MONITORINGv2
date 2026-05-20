@@ -277,8 +277,10 @@ import {
   AcademicCapIcon
 } from '@heroicons/vue/24/outline'
 import * as echarts from 'echarts'
+import { useConfirm } from '../../composables/useConfirm'
 
 const toast = useToast()
+const { confirm } = useConfirm()
 const authStore = useAuthStore()
 
 // State
@@ -426,7 +428,8 @@ const approvePermission = async (id) => {
 }
 
 const rejectPermission = async (id) => {
-  if (!confirm('Tolak pengajuan izin ini?')) return
+  const ok = await confirm({ title: 'Tolak Izin', message: 'Tolak pengajuan izin ini?' })
+  if (!ok) return
   try {
     await axios.put(`/guru/permissions/${id}/reject`)
     toast.success('❌ Izin ditolak')

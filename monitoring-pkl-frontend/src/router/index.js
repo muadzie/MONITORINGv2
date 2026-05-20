@@ -33,6 +33,7 @@ const routes = [
     meta: { auth: true, role: 'Admin' },
     children: [
       { path: 'dashboard', component: () => import('../views/admin/Dashboard.vue') },
+      { path: 'registrations', component: () => import('../views/admin/Registrations.vue') },
       { path: 'users', component: () => import('../views/admin/Users.vue') },
       { path: 'roles', component: () => import('../views/admin/Roles.vue') },
       { path: 'students', component: () => import('../views/admin/Students.vue') },
@@ -50,6 +51,7 @@ const routes = [
       { path: 'settings/school', component: () => import('../views/admin/Settings.vue') },
       { path: 'settings/academic', component: () => import('../views/admin/Settings.vue') },
       { path: 'settings/radius', component: () => import('../views/admin/Settings.vue') },
+      { path: 'notifications', component: () => import('../views/shared/Notifications.vue') },
       { path: 'profile', component: () => import('../views/shared/Profile.vue') },
       { path: '', redirect: '/admin/dashboard' },
     ] 

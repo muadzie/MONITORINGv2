@@ -76,8 +76,10 @@
 import { ref, onMounted } from 'vue'
 import axios from '../../plugins/axios'
 import { useToast } from 'vue-toastification'
+import { useConfirm } from '../../composables/useConfirm'
 
 const toast = useToast()
+const { confirm } = useConfirm()
 const roles = ref([])
 const loading = ref(true)
 const error = ref('')
@@ -147,14 +149,14 @@ const saveRole = async () => {
 }
 
 const deleteRole = async (role) => {
-  if (confirm(`Hapus role "${role.name}"?`)) {
-    try {
-      await axios.delete(`/admin/roles/${role.id}`)
-      toast.success('Role berhasil dihapus')
-      fetchRoles()
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Gagal menghapus role')
-    }
+  const ok = await confirm({ title: 'Hapus Role', message: `Hapus role "${role.name}"?` })
+  if (!ok) return
+  try {
+    await axios.delete(`/admin/roles/${role.id}`)
+    toast.success('Role berhasil dihapus')
+    fetchRoles()
+  } catch (err) {
+    toast.error(err.response?.data?.message || 'Gagal menghapus role')
   }
 }
 

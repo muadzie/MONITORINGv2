@@ -65,6 +65,7 @@ class RegistrationController extends Controller
         $user = User::findOrFail($id);
         $user->update([
             'registration_status' => 'rejected',
+            'is_active' => false,
             'rejection_reason' => $request->reason,
             'approved_by' => auth()->id(),
             'approved_at' => now()
@@ -81,5 +82,15 @@ class RegistrationController extends Controller
         ]);
 
         return response()->json(['message' => 'Pendaftaran ditolak']);
+    }
+
+    // Hapus semua riwayat (hanya user yang ditolak)
+    public function clearHistory()
+    {
+        $deleted = User::where('registration_status', 'rejected')->delete();
+
+        return response()->json([
+            'message' => "{$deleted} riwayat pendaftaran berhasil dihapus"
+        ]);
     }
 }

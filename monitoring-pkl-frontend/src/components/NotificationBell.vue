@@ -41,7 +41,7 @@
       </div>
       
       <div class="p-2 border-t">
-        <router-link to="/notifications" class="block text-center text-sm text-indigo-600 py-2 hover:bg-gray-50 rounded-lg">
+        <router-link :to="notifLink" class="block text-center text-sm text-indigo-600 py-2 hover:bg-gray-50 rounded-lg">
           Lihat semua notifikasi
         </router-link>
       </div>
@@ -50,9 +50,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
 import axios from '../plugins/axios'
 import { BellIcon, CheckCircleIcon, ExclamationCircleIcon, InformationCircleIcon, XCircleIcon } from '@heroicons/vue/24/outline'
+
+const router = useRouter()
+const authStore = useAuthStore()
+const notifLink = computed(() => `/${authStore.role?.toLowerCase() || 'admin'}/notifications`)
 
 const isOpen = ref(false)
 const notifications = ref([])
@@ -108,13 +114,13 @@ const markAsRead = async (notif) => {
       notif.is_read = true
       unreadCount.value--
       if (notif.url) {
-        window.location.href = notif.url
+        router.push(notif.url)
       }
     } catch (error) {
       console.error('Failed to mark as read:', error)
     }
   } else if (notif.url) {
-    window.location.href = notif.url
+    router.push(notif.url)
   }
 }
 
