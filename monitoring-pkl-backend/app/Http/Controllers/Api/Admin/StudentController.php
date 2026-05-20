@@ -77,9 +77,9 @@ class StudentController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'phone' => $request->phone,
+            'phone' => normalizePhone($request->phone),
             'company_id' => $request->company_id,
-            'teacher_id' => $request->teacher_id, // Tambahkan teacher_id
+            'teacher_id' => $request->teacher_id,
             'class_id' => $request->class_id,
             'kelas' => $request->kelas,
             'jurusan' => $request->jurusan,
@@ -160,9 +160,9 @@ class StudentController extends Controller
             'nisn' => $request->nisn,
             'name' => $request->name,
             'email' => $request->email,
-            'phone' => $request->phone,
+            'phone' => normalizePhone($request->phone),
             'company_id' => $request->company_id,
-            'teacher_id' => $request->teacher_id, // Tambahkan teacher_id
+            'teacher_id' => $request->teacher_id,
             'class_id' => $request->class_id,
             'kelas' => $request->kelas,
             'jurusan' => $request->jurusan,

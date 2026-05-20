@@ -8,6 +8,7 @@ use App\Models\Attendance;
 use App\Models\Logbook;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class MonitoringController extends Controller
 {
@@ -56,7 +57,7 @@ class MonitoringController extends Controller
     {
         try {
             $query = User::where('role_id', 2)
-                ->with(['company', 'class'])
+                ->with(['company', 'class', 'teacher'])
                 ->withCount(['logbooks'])
                 ->withAvg('logbooks as avg_grade', 'grade');
 
@@ -80,6 +81,7 @@ class MonitoringController extends Controller
                     'name' => $student->name,
                     'class' => $student->class,
                     'company' => $student->company,
+                    'teacher' => $student->teacher,
                     'logbook_count' => $logbookCount,
                     'progress' => min(100, round(($logbookCount / 30) * 100)),
                     'avg_grade' => $avgGrade ? round((float) $avgGrade, 2) : 0,
@@ -225,6 +227,37 @@ class MonitoringController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Terjadi kesalahan internal'
+            ], 500);
+        }
+    }
+
+    public function downloadAttachment($id)
+    {
+        try {
+            $logbook = Logbook::findOrFail($id);
+
+            if (!$logbook->attachment) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tidak ada lampiran'
+                ], 404);
+            }
+
+            if (!Storage::disk('public')->exists($logbook->attachment)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'File lampiran tidak ditemukan'
+                ], 404);
+            }
+
+            $filePath = Storage::disk('public')->path($logbook->attachment);
+            $fileName = basename($logbook->attachment);
+
+            return response()->download($filePath, $fileName);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mendownload lampiran'
             ], 500);
         }
     }

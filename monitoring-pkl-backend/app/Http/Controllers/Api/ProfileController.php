@@ -29,6 +29,7 @@ class ProfileController extends Controller
             'phone' => 'nullable|string|max:20',
         ]);
 
+        $request->merge(['phone' => normalizePhone($request->phone)]);
         $user->update($request->only(['name', 'email', 'phone']));
 
         return response()->json([

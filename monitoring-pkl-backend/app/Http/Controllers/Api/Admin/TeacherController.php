@@ -43,7 +43,7 @@ class TeacherController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'nip' => $request->nip,
-            'phone' => $request->phone,
+            'phone' => normalizePhone($request->phone),
             'mata_pelajaran' => $request->mata_pelajaran,
             'role_id' => 3, // role guru
         ]);
@@ -81,7 +81,7 @@ class TeacherController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'nip' => $request->nip,
-            'phone' => $request->phone,
+            'phone' => normalizePhone($request->phone),
             'mata_pelajaran' => $request->mata_pelajaran,
         ];
 

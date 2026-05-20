@@ -51,7 +51,7 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">No. Telepon</label>
-              <input v-model="siswaForm.phone" type="tel" placeholder="08123456789" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500">
+              <input v-model="siswaForm.phone" @input="formatPhone($event, siswaForm, 'phone')" type="tel" placeholder="628123456789" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500">
             </div>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -114,7 +114,7 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">No. Telepon</label>
-              <input v-model="guruForm.phone" type="tel" placeholder="08123456789" class="w-full px-4 py-2 border rounded-lg">
+              <input v-model="guruForm.phone" @input="formatPhone($event, guruForm, 'phone')" type="tel" placeholder="628123456789" class="w-full px-4 py-2 border rounded-lg">
             </div>
           </div>
           <div>
@@ -155,7 +155,7 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Telepon</label>
-              <input v-model="perusahaanForm.telepon" type="tel" required placeholder="Nomor telepon perusahaan" class="w-full px-4 py-2 border rounded-lg">
+              <input v-model="perusahaanForm.telepon" @input="formatPhone($event, perusahaanForm, 'telepon')" type="tel" required placeholder="628123456789" class="w-full px-4 py-2 border rounded-lg">
             </div>
           </div>
           <div>
@@ -179,7 +179,7 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">No. Telepon Pengguna</label>
-              <input v-model="perusahaanForm.phone" type="tel" placeholder="Nomor telepon pengguna" class="w-full px-4 py-2 border rounded-lg">
+              <input v-model="perusahaanForm.phone" @input="formatPhone($event, perusahaanForm, 'phone')" type="tel" placeholder="628123456789" class="w-full px-4 py-2 border rounded-lg">
             </div>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -252,6 +252,14 @@ const perusahaanForm = ref({
   name: '', email: '', phone: '', password: '', password_confirmation: '',
   nama_perusahaan: '', alamat: '', telepon: '', bidang_usaha: '', kontak_person: '', jabatan: ''
 })
+
+const formatPhone = (e, form, field) => {
+  let val = e.target.value.replace(/[^0-9]/g, '')
+  if (val && !val.startsWith('62')) {
+    val = '62' + val.replace(/^0/, '')
+  }
+  form[field] = val
+}
 
 const submitSiswa = async () => {
   loading.value = true

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\Placement;
 use App\Models\Permission;
+use App\Models\CompanyHoliday;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -61,6 +62,24 @@ class AttendanceController extends Controller
         }
 
         $company = $placement->company;
+
+        // ============================================================
+        // CEK APAKAH HARI INI LIBUR UNTUK PERUSAHAAN INI
+        // ============================================================
+        $isHoliday = CompanyHoliday::where('company_id', $company->id)
+            ->where('date', $today)
+            ->exists();
+
+        if ($isHoliday) {
+            $holiday = CompanyHoliday::where('company_id', $company->id)
+                ->where('date', $today)
+                ->first();
+            return response()->json([
+                'success' => false,
+                'message' => 'Hari ini adalah hari libur di ' . $company->name . ($holiday->description ? ' (' . $holiday->description . ')' : '') . '. Tidak perlu melakukan absensi.',
+                'is_holiday' => true,
+            ], 400);
+        }
 
         // ============================================================
         // VALIDASI RADIUS
@@ -145,6 +164,27 @@ class AttendanceController extends Controller
             ], 400);
         }
 
+        // ============================================================
+        // CEK APAKAH HARI INI LIBUR UNTUK PERUSAHAAN
+        // ============================================================
+        $placement = Placement::where('student_id', $user->id)
+            ->where('status', 'active')
+            ->first();
+
+        if ($placement) {
+            $isHoliday = CompanyHoliday::where('company_id', $placement->company_id)
+                ->where('date', $today)
+                ->exists();
+
+            if ($isHoliday) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Hari ini adalah hari libur di perusahaan anda. Tidak perlu melakukan absensi.',
+                    'is_holiday' => true,
+                ], 400);
+            }
+        }
+
         $attendance = Attendance::where('user_id', $user->id)
             ->whereDate('date', $today)
             ->first();
@@ -197,7 +237,37 @@ class AttendanceController extends Controller
                 'message' => "Hari ini Anda sedang " . ($permission->type === 'sick' ? 'SAKIT' : 'IZIN')
             ]);
         }
-        
+
+        // Cek apakah hari ini libur perusahaan
+        $placement = Placement::where('student_id', $user->id)
+            ->where('status', 'active')
+            ->first();
+
+        $isHoliday = false;
+        $holidayDescription = null;
+
+        if ($placement) {
+            $holiday = CompanyHoliday::where('company_id', $placement->company_id)
+                ->where('date', $today)
+                ->first();
+
+            if ($holiday) {
+                $isHoliday = true;
+                $holidayDescription = $holiday->description;
+            }
+        }
+
+        if ($isHoliday) {
+            return response()->json([
+                'success' => true,
+                'has_checked_in' => false,
+                'has_checked_out' => false,
+                'is_holiday' => true,
+                'holiday_description' => $holidayDescription,
+                'message' => 'Hari ini adalah hari libur' . ($holidayDescription ? ' (' . $holidayDescription . ')' : '')
+            ]);
+        }
+
         $attendance = Attendance::where('user_id', $user->id)
             ->whereDate('date', $today)
             ->first();
@@ -207,6 +277,7 @@ class AttendanceController extends Controller
             'has_checked_in' => $attendance && $attendance->check_in ? true : false,
             'has_checked_out' => $attendance && $attendance->check_out ? true : false,
             'is_permission_day' => false,
+            'is_holiday' => false,
             'data' => $attendance
         ]);
     }
@@ -293,12 +364,24 @@ class AttendanceController extends Controller
         if ($startDate > $endDate) {
             return;
         }
+
+        // Ambil daftar hari libur perusahaan
+        $companyHolidays = CompanyHoliday::where('company_id', $placement->company_id)
+            ->whereBetween('date', [$startDate->format('Y-m-d'), $currentDate])
+            ->pluck('date')
+            ->map(fn($d) => Carbon::parse($d)->format('Y-m-d'))
+            ->toArray();
         
         for ($date = clone $startDate; $date <= $endDate; $date->addDay()) {
             $dateStr = $date->format('Y-m-d');
             
-            // Lewati hari libur (Sabtu/Minggu) - opsional
+            // Lewati hari libur (Sabtu/Minggu)
             if ($date->isWeekend()) {
+                continue;
+            }
+
+            // Lewati hari libur perusahaan
+            if (in_array($dateStr, $companyHolidays)) {
                 continue;
             }
             

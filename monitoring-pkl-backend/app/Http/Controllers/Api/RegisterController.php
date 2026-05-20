@@ -35,7 +35,7 @@ class RegisterController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'nisn' => $request->nisn,
-            'phone' => $request->phone,
+            'phone' => normalizePhone($request->phone),
             'role_id' => 2, // role siswa
             'registration_status' => 'pending',
             'is_active' => false
@@ -71,7 +71,7 @@ class RegisterController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'nip' => $request->nip,
-            'phone' => $request->phone,
+            'phone' => normalizePhone($request->phone),
             'role_id' => 3, // role guru
             'registration_status' => 'pending',
             'is_active' => false
@@ -110,7 +110,7 @@ class RegisterController extends Controller
             'role_id' => 4, // role perusahaan
             'bidang_usaha' => $request->bidang_usaha,
             'kontak_person' => $request->kontak_person,
-            'phone' => $request->telepon,
+            'phone' => normalizePhone($request->telepon),
             'registration_status' => 'pending',
             'is_active' => false
         ]);
@@ -119,7 +119,7 @@ class RegisterController extends Controller
         $perusahaan = \App\Models\Company::create([
             'name' => $request->nama_perusahaan,
             'address' => $request->alamat,
-            'phone' => $request->telepon,
+            'phone' => normalizePhone($request->telepon),
             'email' => $request->email,
             'description' => $request->bidang_usaha,
         ]);
@@ -141,14 +141,13 @@ class RegisterController extends Controller
         $admins = User::where('role_id', 1)->get();
         
         foreach ($admins as $admin) {
-            Notification::create([
-                'user_id' => $admin->id,
-                'title' => 'Pendaftaran Baru',
-                'message' => "Pendaftaran baru dari {$user->name} sebagai {$role}. Silakan verifikasi.",
-                'type' => 'info',
-                'url' => '/admin/registrations',
-                'is_read' => false
-            ]);
+            sendNotification(
+                $admin->id,
+                'Pendaftaran Baru',
+                "Pendaftaran baru dari {$user->name} sebagai {$role}. Silakan verifikasi.",
+                'info',
+                '/admin/registrations'
+            );
         }
     }
 }

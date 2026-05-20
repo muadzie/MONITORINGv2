@@ -20,6 +20,18 @@
       </div>
     </div>
 
+    <!-- Info Hari Libur Perusahaan -->
+    <div v-if="isHoliday" class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+      <div class="flex items-center gap-3">
+        <span class="text-3xl">🎉</span>
+        <div>
+          <p class="font-semibold text-amber-800">Hari ini adalah hari libur!</p>
+          <p class="text-sm text-amber-600">{{ holidayDescription || 'Libur perusahaan' }}</p>
+          <p class="text-xs text-amber-500 mt-1">Selamat berlibur! Tidak perlu melakukan absensi.</p>
+        </div>
+      </div>
+    </div>
+
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Status Card -->
       <div class="bg-white rounded-2xl shadow-sm p-6">
@@ -31,14 +43,14 @@
           <div class="mt-6 space-y-3">
             <button 
               @click="checkIn" 
-              :disabled="hasCheckedIn || loading || isPermissionDay"
+              :disabled="hasCheckedIn || loading || isPermissionDay || isHoliday"
               class="w-full bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 transition disabled:opacity-50 font-semibold"
             >
               {{ loading ? 'Memproses...' : '📍 Check In' }}
             </button>
             <button 
               @click="checkOut" 
-              :disabled="!hasCheckedIn || hasCheckedOut || loading || isPermissionDay"
+              :disabled="!hasCheckedIn || hasCheckedOut || loading || isPermissionDay || isHoliday"
               class="w-full bg-red-600 text-white py-3 rounded-xl hover:bg-red-700 transition disabled:opacity-50 font-semibold"
             >
               {{ loading ? 'Memproses...' : '🏁 Check Out' }}
@@ -130,12 +142,15 @@ const history = ref([])
 const isPermissionDay = ref(false)
 const permissionType = ref('')
 const permissionReason = ref('')
+const isHoliday = ref(false)
+const holidayDescription = ref('')
 let watchId = null
 let map = null
 let userMarker = null
 
 // Computed
 const statusIcon = computed(() => {
+  if (isHoliday.value) return '🎉'
   if (hasCheckedOut.value) return '✅'
   if (hasCheckedIn.value) return '📍'
   if (isPermissionDay.value) return permissionType.value === 'sick' ? '🤒' : '📝'
@@ -222,8 +237,17 @@ const loadTodayStatus = async () => {
     console.log('Hari ini tanggal:', today)
     console.log('Permission date:', response.data.permission_date)
     
-    if (response.data.is_permission_day) {
+    if (response.data.is_holiday) {
+      isHoliday.value = true
+      isPermissionDay.value = false
+      holidayDescription.value = response.data.holiday_description || ''
+      statusText.value = '🎉 Libur'
+      hasCheckedIn.value = false
+      hasCheckedOut.value = false
+      toast.info(`Hari ini libur${holidayDescription.value ? ' (' + holidayDescription.value + ')' : ''}. Tidak perlu absen.`)
+    } else if (response.data.is_permission_day) {
       // Verifikasi tanggal permission
+      isHoliday.value = false
       if (response.data.permission_date && response.data.permission_date !== today) {
         console.warn('Permission date mismatch, ignoring...')
         isPermissionDay.value = false
@@ -237,6 +261,7 @@ const loadTodayStatus = async () => {
         toast.info(`Hari ini Anda sedang ${permissionType.value === 'sick' ? 'SAKIT' : 'IZIN'}. Tidak perlu absen.`)
       }
     } else {
+      isHoliday.value = false
       isPermissionDay.value = false
       hasCheckedIn.value = response.data.has_checked_in || false
       hasCheckedOut.value = response.data.has_checked_out || false
@@ -273,6 +298,11 @@ const checkIn = async () => {
   
   if (isPermissionDay.value) {
     toast.warning(`Anda sedang ${permissionType.value === 'sick' ? 'SAKIT' : 'IZIN'} hari ini. Tidak perlu absen.`)
+    return
+  }
+  
+  if (isHoliday.value) {
+    toast.warning('Hari ini adalah hari libur. Tidak perlu absen.')
     return
   }
   

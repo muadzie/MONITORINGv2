@@ -248,7 +248,7 @@
             </div>
             <div>
               <label class="block text-sm font-semibold text-gray-700 mb-1">No. Telepon</label>
-              <input v-model="form.phone" type="tel" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="08123456789">
+              <input v-model="form.phone" @input="formatPhone($event)" type="tel" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="628123456789">
             </div>
           </div>
 
@@ -336,6 +336,14 @@ const form = ref({
 })
 
 // Helper functions
+const formatPhone = (e) => {
+  let val = e.target.value.replace(/[^0-9]/g, '')
+  if (val && !val.startsWith('62')) {
+    val = '62' + val.replace(/^0/, '')
+  }
+  form.value.phone = val
+}
+
 const getSelectedCompanyName = () => {
   const company = companies.value.find(c => c.id === parseInt(form.value.company_id))
   return company ? company.name : ''

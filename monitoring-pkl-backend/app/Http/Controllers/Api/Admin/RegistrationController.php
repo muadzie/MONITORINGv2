@@ -43,14 +43,13 @@ class RegistrationController extends Controller
         ]);
 
         // Kirim notifikasi ke user
-        Notification::create([
-            'user_id' => $user->id,
-            'title' => 'Pendaftaran Disetujui',
-            'message' => 'Pendaftaran Anda telah disetujui. Silakan login ke sistem.',
-            'type' => 'success',
-            'url' => '/login',
-            'is_read' => false
-        ]);
+        sendNotification(
+            $user->id,
+            'Pendaftaran Disetujui',
+            'Pendaftaran Anda telah disetujui. Silakan login ke sistem.',
+            'success',
+            '/login'
+        );
 
         return response()->json(['message' => 'Pendaftaran disetujui']);
     }
@@ -72,14 +71,13 @@ class RegistrationController extends Controller
         ]);
 
         // Kirim notifikasi ke user
-        Notification::create([
-            'user_id' => $user->id,
-            'title' => 'Pendaftaran Ditolak',
-            'message' => "Pendaftaran Anda ditolak. Alasan: {$request->reason}",
-            'type' => 'error',
-            'url' => '/register',
-            'is_read' => false
-        ]);
+        sendNotification(
+            $user->id,
+            'Pendaftaran Ditolak',
+            "Pendaftaran Anda ditolak. Alasan: {$request->reason}",
+            'error',
+            '/register'
+        );
 
         return response()->json(['message' => 'Pendaftaran ditolak']);
     }

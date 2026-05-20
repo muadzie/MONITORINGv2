@@ -33,7 +33,7 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">No. Telepon</label>
-            <input v-model="profile.phone" type="tel" class="w-full px-4 py-2 border rounded-lg">
+            <input v-model="profile.phone" @input="formatPhone($event)" type="tel" class="w-full px-4 py-2 border rounded-lg" placeholder="628123456789">
           </div>
           
           <div class="border-t pt-4">
@@ -76,6 +76,14 @@ const profile = ref({
   email: '',
   phone: ''
 })
+
+const formatPhone = (e) => {
+  let val = e.target.value.replace(/[^0-9]/g, '')
+  if (val && !val.startsWith('62')) {
+    val = '62' + val.replace(/^0/, '')
+  }
+  profile.value.phone = val
+}
 
 const password = ref({
   new: '',

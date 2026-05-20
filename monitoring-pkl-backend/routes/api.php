@@ -51,6 +51,11 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
     
     // ---------------------- COMPANY MANAGEMENT -----------------
     Route::apiResource('companies', App\Http\Controllers\Api\Admin\CompanyController::class);
+    Route::prefix('companies/{company}')->group(function () {
+        Route::get('/holidays', [App\Http\Controllers\Api\Admin\CompanyController::class, 'holidays']);
+        Route::post('/holidays', [App\Http\Controllers\Api\Admin\CompanyController::class, 'addHoliday']);
+        Route::delete('/holidays/{holiday}', [App\Http\Controllers\Api\Admin\CompanyController::class, 'removeHoliday']);
+    });
     
     // ---------------------- CLASS MANAGEMENT -------------------
     Route::apiResource('classes', App\Http\Controllers\Api\Admin\ClassController::class);
@@ -115,6 +120,10 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
         Route::post('/academic', [App\Http\Controllers\Api\Admin\SettingController::class, 'updateAcademic']);
         Route::get('/radius', [App\Http\Controllers\Api\Admin\SettingController::class, 'radius']);
         Route::post('/radius', [App\Http\Controllers\Api\Admin\SettingController::class, 'updateRadius']);
+        Route::get('/rules', [App\Http\Controllers\Api\Admin\SettingController::class, 'rules']);
+        Route::post('/rules', [App\Http\Controllers\Api\Admin\SettingController::class, 'updateRules']);
+        Route::get('/notifications', [App\Http\Controllers\Api\Admin\SettingController::class, 'notifications']);
+        Route::post('/notifications', [App\Http\Controllers\Api\Admin\SettingController::class, 'updateNotifications']);
     });
 });
 
@@ -124,6 +133,7 @@ Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/companies', [App\Http\Controllers\Api\Admin\CompanyController::class, 'index']);
     Route::get('/companies/{id}', [App\Http\Controllers\Api\Admin\CompanyController::class, 'show']);
+    Route::get('/logbooks/{id}/download', [App\Http\Controllers\Api\Admin\MonitoringController::class, 'downloadAttachment']);
 });
 
 // ================================================================

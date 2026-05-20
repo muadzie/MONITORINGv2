@@ -66,6 +66,9 @@
           <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
             <h3 class="text-white font-bold text-lg">{{ company.name }}</h3>
           </div>
+          <div v-if="company.holidays_count > 0" class="absolute top-2 right-2 bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+            {{ company.holidays_count }} libur
+          </div>
         </div>
         <div class="p-4">
           <p class="text-gray-600 text-sm flex items-start gap-2 mb-3">
@@ -90,6 +93,11 @@
               </button>
               <button @click="deleteCompany(company)" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition" title="Hapus">
                 <TrashIcon class="w-4 h-4" />
+              </button>
+              <button @click="openHolidayModal(company)" class="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition" title="Atur Hari Libur">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
               </button>
             </div>
           </div>
@@ -161,7 +169,7 @@
               <div class="grid grid-cols-2 gap-3">
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1">Telepon</label>
-                  <input v-model="form.phone" type="tel" class="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500">
+                  <input v-model="form.phone" @input="formatPhone($event)" type="tel" class="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="628123456789">
                 </div>
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
@@ -193,6 +201,64 @@
             </button>
           </div>
         </form>
+      </div>
+    </div>
+    <!-- Modal Atur Hari Libur -->
+    <div v-if="showHolidayModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50" @click.self="showHolidayModal = false">
+      <div class="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div class="sticky top-0 bg-white p-5 border-b">
+          <div class="flex justify-between items-center">
+            <div>
+              <h3 class="text-xl font-bold text-gray-800">Atur Hari Libur</h3>
+              <p class="text-sm text-gray-500">{{ holidayCompany?.name }}</p>
+            </div>
+            <button @click="showHolidayModal = false" class="text-gray-400 hover:text-gray-600 transition">
+              <XMarkIcon class="w-6 h-6" />
+            </button>
+          </div>
+        </div>
+        <div class="p-5">
+          <form @submit.prevent="addHoliday" class="flex gap-2 mb-4">
+            <input 
+              v-model="holidayForm.date" 
+              type="date" 
+              class="flex-1 px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500" 
+              required
+            >
+            <input 
+              v-model="holidayForm.description" 
+              type="text" 
+              placeholder="Keterangan (opsional)"
+              class="flex-1 px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+            >
+            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm" :disabled="holidaySaving">
+              {{ holidaySaving ? '...' : 'Tambah' }}
+            </button>
+          </form>
+
+          <div v-if="holidayLoading" class="text-center py-4">
+            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600 mx-auto"></div>
+          </div>
+
+          <div v-else-if="holidays.length === 0" class="text-center py-8 text-gray-400">
+            <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            <p>Belum ada hari libur</p>
+          </div>
+
+          <div v-else class="space-y-2">
+            <div v-for="h in holidays" :key="h.id" class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div>
+                <p class="text-sm font-medium text-gray-800">{{ formatDate(h.date) }}</p>
+                <p v-if="h.description" class="text-xs text-gray-500">{{ h.description }}</p>
+              </div>
+              <button @click="removeHoliday(h)" class="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition" title="Hapus">
+                <TrashIcon class="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -233,6 +299,25 @@ const form = ref({
   radius: 100,
   phone: '',
   email: '',
+  description: ''
+})
+
+const formatPhone = (e) => {
+  let val = e.target.value.replace(/[^0-9]/g, '')
+  if (val && !val.startsWith('62')) {
+    val = '62' + val.replace(/^0/, '')
+  }
+  form.value.phone = val
+}
+
+// Holiday management
+const showHolidayModal = ref(false)
+const holidayCompany = ref(null)
+const holidays = ref([])
+const holidayLoading = ref(false)
+const holidaySaving = ref(false)
+const holidayForm = ref({
+  date: '',
   description: ''
 })
 
@@ -507,6 +592,71 @@ const deleteCompany = async (company) => {
     console.error('Delete error:', error)
     toast.error(error.response?.data?.message || 'Gagal menghapus perusahaan')
   }
+}
+
+// Holiday Management
+const openHolidayModal = async (company) => {
+  holidayCompany.value = company
+  holidays.value = []
+  holidayForm.value = { date: '', description: '' }
+  showHolidayModal.value = true
+  holidayLoading.value = true
+
+  try {
+    const res = await axios.get(`/admin/companies/${company.id}/holidays`)
+    holidays.value = Array.isArray(res.data) ? res.data : (res.data.data || [])
+  } catch (error) {
+    console.error('Fetch holidays error:', error)
+    toast.error('Gagal memuat data hari libur')
+  } finally {
+    holidayLoading.value = false
+  }
+}
+
+const addHoliday = async () => {
+  if (!holidayForm.value.date) {
+    toast.warning('Pilih tanggal libur')
+    return
+  }
+
+  holidaySaving.value = true
+  try {
+    const res = await axios.post(`/admin/companies/${holidayCompany.value.id}/holidays`, {
+      date: holidayForm.value.date,
+      description: holidayForm.value.description || null
+    })
+    holidays.value.unshift(res.data)
+    holidayForm.value = { date: '', description: '' }
+    toast.success('Hari libur berhasil ditambahkan')
+    fetchCompanies()
+  } catch (error) {
+    const msg = error.response?.data?.message || 'Gagal menambah hari libur'
+    toast.error(msg)
+  } finally {
+    holidaySaving.value = false
+  }
+}
+
+const removeHoliday = async (holiday) => {
+  try {
+    await axios.delete(`/admin/companies/${holidayCompany.value.id}/holidays/${holiday.id}`)
+    holidays.value = holidays.value.filter(h => h.id !== holiday.id)
+    toast.success('Hari libur berhasil dihapus')
+    fetchCompanies()
+  } catch (error) {
+    toast.error('Gagal menghapus hari libur')
+  }
+}
+
+const formatDate = (date) => {
+  if (!date) return '-'
+  const d = new Date(date)
+  return d.toLocaleDateString('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  })
 }
 
 onMounted(() => {

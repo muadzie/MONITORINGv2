@@ -229,6 +229,31 @@
             </label>
           </div>
         </div>
+
+        <!-- Konfigurasi API WhatsApp -->
+        <div class="mt-6 p-4 bg-gray-50 rounded-xl">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+              </svg>
+            </div>
+            <div>
+              <p class="font-medium text-gray-800">Konfigurasi API WhatsApp</p>
+              <p class="text-sm text-gray-500">Masukkan API Key dari <a href="https://fonnte.com" target="_blank" class="text-green-600 underline">Fonnte</a> (daftar gratis)</p>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Fonnte API Key</label>
+            <div class="flex gap-2">
+              <input v-model="waApiKey" type="text" placeholder="Masukkan API Key..." class="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500">
+              <button @click="saveWaApiKey" :disabled="savingWa" class="px-4 py-2.5 bg-green-600 text-white rounded-xl hover:bg-green-700 transition disabled:opacity-50">
+                {{ savingWa ? 'Menyimpan...' : 'Simpan Key' }}
+              </button>
+            </div>
+            <p class="text-xs text-gray-400 mt-1">* API Key digunakan untuk mengirim notifikasi WhatsApp otomatis. Dapatkan di <a href="https://fonnte.com" target="_blank" class="text-green-600 underline">fonnte.com</a></p>
+          </div>
+        </div>
         
         <div class="flex justify-end pt-6 mt-4 border-t">
           <button @click="saveNotifications" :disabled="saving" class="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:shadow-lg transition-all duration-300 flex items-center gap-2 disabled:opacity-50">
@@ -296,6 +321,25 @@ const notifications = ref({
   logbook: true
 })
 
+const waApiKey = ref('')
+const savingWa = ref(false)
+
+const saveWaApiKey = async () => {
+  if (!waApiKey.value) {
+    toast.warning('Masukkan API Key')
+    return
+  }
+  savingWa.value = true
+  try {
+    await axios.post('/admin/settings/general', { fonnte_api_key: waApiKey.value })
+    toast.success('API Key WhatsApp berhasil disimpan')
+  } catch (error) {
+    toast.error('Gagal menyimpan API Key')
+  } finally {
+    savingWa.value = false
+  }
+}
+
 const saveGeneralSettings = async () => {
   saving.value = true
   try {
@@ -335,19 +379,22 @@ const saveNotifications = async () => {
 const loadSettings = async () => {
   try {
     const [generalRes, rulesRes, notifRes] = await Promise.all([
-      axios.get('/admin/settings/general').catch(() => ({ data: {} })),
-      axios.get('/admin/settings/rules').catch(() => ({ data: {} })),
-      axios.get('/admin/settings/notifications').catch(() => ({ data: {} }))
+      axios.get('/admin/settings/general').catch(() => ({ data: { data: {} } })),
+      axios.get('/admin/settings/rules').catch(() => ({ data: { data: {} } })),
+      axios.get('/admin/settings/notifications').catch(() => ({ data: { data: {} } }))
     ])
     
-    if (generalRes.data) {
-      settings.value = { ...settings.value, ...generalRes.data }
+    if (generalRes.data?.data) {
+      settings.value = { ...settings.value, ...generalRes.data.data }
+      if (generalRes.data.data.fonnte_api_key) {
+        waApiKey.value = generalRes.data.data.fonnte_api_key
+      }
     }
-    if (rulesRes.data) {
-      rules.value = { ...rules.value, ...rulesRes.data }
+    if (rulesRes.data?.data) {
+      rules.value = { ...rules.value, ...rulesRes.data.data }
     }
-    if (notifRes.data) {
-      notifications.value = { ...notifications.value, ...notifRes.data }
+    if (notifRes.data?.data) {
+      notifications.value = { ...notifications.value, ...notifRes.data.data }
     }
   } catch (error) {
     console.error('Failed to load settings:', error)
